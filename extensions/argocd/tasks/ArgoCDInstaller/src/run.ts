@@ -88,7 +88,9 @@ export function getEndpointDetails(connectionEndpoint: string): string {
 
   taskLib.setVariable('ARGOCD_SERVER', url.host + path)
   taskLib.setVariable('ARGOCD_AUTH_TOKEN', apitoken, true)
-  return new URL(url.pathname, url.origin).href
+  const base = new URL(url.pathname, url.origin)
+  if (!base.pathname.endsWith('/')) base.pathname += '/'
+  return base.href
 }
 
 /**
@@ -116,7 +118,7 @@ export async function resolveVersion(inputVersion: string, serverUrl?: string): 
  * Fetches and parses ArgoCD server version from the API.
  *
  * @param url Base ArgoCD server URL.
- * @returns Server-reported semantic version without build metadata.
+ * @returns Server-reported version.
  */
 export async function getServerVersion(url: string): Promise<string> {
   taskLib.debug(`Resolving version from: ${url}`)

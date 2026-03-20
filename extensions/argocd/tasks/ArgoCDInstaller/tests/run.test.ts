@@ -44,7 +44,7 @@ describe('getEndpointDetails', () => {
 
     const result = getEndpointDetails('myconn')
 
-    expect(result).toBe('https://argocd.example.com/argocd')
+    expect(result).toBe('https://argocd.example.com/argocd/')
     expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_SERVER', 'argocd.example.com/argocd')
   })
 })
@@ -160,6 +160,19 @@ describe('getServerVersion', () => {
 
     await expect(getServerVersion('https://argocd.example.com')).rejects.toThrow(
       'Failed to resolve version from server https://argocd.example.com',
+    )
+  })
+
+  it('should preserve path prefix when building version URL', async () => {
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue({ Version: 'v2.9.3' }),
+    } as unknown as Response
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
+
+    await getServerVersion('https://argocd.example.com/argocd/')
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ url: 'https://argocd.example.com/argocd/api/version' }),
     )
   })
 })
@@ -379,6 +392,33 @@ describe('run', () => {
 
     expect(mockInstallTool).toHaveBeenCalledTimes(2)
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'github also failed')
+  })
+
+  it('should preserve path prefix in server download URL', async () => {
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue({ Version: 'v2.9.3' }),
+    } as unknown as Response
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
+
+    mockedTask.getInput.mockImplementation((name: string) => {
+      if (name === 'version') return 'server'
+      if (name === 'connection') return 'myconn'
+      return undefined
+    })
+    mockedTask.getEndpointUrlRequired.mockReturnValue('https://argocd.example.com/argocd')
+    mockedTask.getEndpointAuthorizationParameterRequired.mockReturnValue('token123')
+    mockedTool.findLocalTool.mockReturnValue('')
+    mockInstallTool.mockResolvedValue(undefined)
+
+    await run()
+
+    expect(mockInstallTool).toHaveBeenCalledWith(
+      'argocd',
+      '2.9.3',
+      'https://argocd.example.com/argocd/download/argocd-linux-amd64',
+      false,
+    )
+    expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
   })
 
   it('should use Windows-specific binary name on Windows platform', async () => {

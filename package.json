@@ -1,12 +1,13 @@
 {
   "name": "azure-devops-extensions",
   "scripts": {
+    "prepare": "git fetch origin main",
     "changeset": "changeset",
     "typecheck": "tsc --build --emitDeclarationOnly",
-    "test": "vitest run",
+    "test": "vitest",
     "prebuild": "pnpm --filter ./packages/* exec tsc --build",
-    "build": "pnpm --filter ./extensions/* exec node ../../tools/build-tasks.mjs",
-    "package": "pnpm --filter ./extensions/* exec tfx extension create --manifest-js vss-extension.js",
+    "build": "pnpm --filter '...{extensions}[origin/main]' exec node ../../tools/build-tasks.mjs",
+    "package": "pnpm --filter '...{extensions}[origin/main]' exec tfx extension create --manifest-js vss-extension.js",
     "publish": "pnpm --filter '...{extensions}[origin/main]' exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN"
   },
   "simple-git-hooks": {
