@@ -6,7 +6,7 @@
 
 * Removed hardcoded fallback version - version resolution failures now surface as explicit errors instead of silently installing a pinned release.
 * Task fails early when `version` is set to `server` but no service connection is provided.
-* Install ArgoCD CLI directly from the connected server's download endpoint when `version` is set to `server`. Automatically falls back to the GitHub release if the server endpoint is not accessible.
+* Install Argo CD CLI directly from the connected server's download endpoint when `version` is set to `server`. Automatically falls back to the GitHub release if the server endpoint is not accessible.
 * `ARGOCD_AUTH_TOKEN` pipeline variable is now set as a secret.
 
 ### Internal Changes
