@@ -1,6 +1,6 @@
 const { globSync } = require('glob')
 const { readFileSync, writeFileSync, rmSync } = require('node:fs')
-const { dirname } = require('node:path')
+const { dirname, basename } = require('node:path')
 
 const repository = 'https://github.com/bonddim/azure-devops-extensions'
 
@@ -38,10 +38,9 @@ function patchTaskVersions(taskJsonPaths, patchVersion) {
  */
 function buildContributions(taskJsonPaths) {
   return taskJsonPaths.map((taskJsonPath) => {
-    const task = JSON.parse(readFileSync(taskJsonPath, 'utf-8'))
     const taskDir = dirname(taskJsonPath)
     return {
-      id: task.name,
+      id: basename(taskDir),
       type: 'ms.vss-distributed-task.task',
       targets: ['ms.vss-distributed-task.tasks'],
       properties: { name: taskDir },
