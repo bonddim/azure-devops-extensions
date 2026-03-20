@@ -24,7 +24,7 @@ jobs:
           version: 10
           cache: true
 
-      - run: pnpm install --frozen-lockfile --ignore-scripts --prefer-offline
+      - run: pnpm install --ignore-scripts --prefer-offline
       - run: pnpm biome ci
       - run: pnpm run typecheck
       - run: pnpm run test --coverage
