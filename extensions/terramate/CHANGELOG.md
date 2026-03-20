@@ -10,3 +10,5 @@
 
 * Migrated to pnpm monorepo workspace.
 * Switched build tooling from `tsc` to esbuild (bundled single-file output) and removing `node_modules` from the final vsix package.
+* Added Vitest for testing.
+* Added Biome for linting and formatting.

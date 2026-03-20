@@ -1,5 +1,4 @@
 import * as task from 'azure-pipelines-task-lib/task'
-import * as tool from 'azure-pipelines-tool-lib/tool'
 import { describe, expect, it, vi } from 'vitest'
 
 const { mockGetLatestVersion, mockInstallTool } = vi.hoisted(() => ({
@@ -19,7 +18,6 @@ vi.mock('azure-pipelines-tool-lib/tool', async (importOriginal) => {
 })
 
 const mockedTask = vi.mocked(task)
-const mockedTool = vi.mocked(tool)
 
 import { run } from '../src/run'
 
