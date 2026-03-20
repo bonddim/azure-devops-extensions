@@ -1,3 +1,3 @@
 import { run } from './run'
 
-run()
+run().then(() => process.exit(0))

@@ -10,8 +10,7 @@ Each extension is designed to solve specific problems and improve the efficiency
 
 ## Extensions
 
-- [Argo CD CLI Installer](https://github.com/bonddim/azure-devops-extensions/blob/main/tasks/ArgoCDInstaller/README.md) -
-  Install Argo CD CLI on pipeline agents
+- [Argo CD CLI Extension](https://marketplace.visualstudio.com/items/bonddim.argocd-installer) - Install Argo CD CLI on pipeline agents.
 
 ## Contributing
 

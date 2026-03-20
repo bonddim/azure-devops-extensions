@@ -14,7 +14,10 @@ vi.mock('@bonddim/utils', () => ({
   isHttpError: (error: unknown) => error instanceof Error && 'httpStatusCode' in error,
 }))
 vi.mock('azure-pipelines-task-lib/task')
-vi.mock('azure-pipelines-tool-lib/tool')
+vi.mock('azure-pipelines-tool-lib/tool', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('azure-pipelines-tool-lib/tool')>()
+  return { ...actual, findLocalTool: vi.fn() }
+})
 
 const mockedTask = vi.mocked(task)
 const mockedTool = vi.mocked(tool)
@@ -66,6 +69,21 @@ describe('resolveVersion', () => {
     expect(result).toBe('v2.10.0')
   })
 
+  it("should resolve 'SERVER' case-insensitively", async () => {
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue({ Version: 'v2.9.3' }),
+    } as unknown as Response
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
+
+    const result = await resolveVersion('SERVER', 'https://argocd.example.com')
+
+    expect(result).toBe('v2.9.3')
+  })
+
+  it("should throw when 'server' is requested without a server URL", async () => {
+    await expect(resolveVersion('server')).rejects.toThrow('Server URL is required when version is server')
+  })
+
   it("should resolve 'server' by fetching from ArgoCD server API", async () => {
     const mockResponse = {
       json: vi.fn().mockResolvedValue({ Version: 'v2.9.3+abc123' }),
@@ -74,7 +92,7 @@ describe('resolveVersion', () => {
 
     const result = await resolveVersion('server', 'https://argocd.example.com')
 
-    expect(result).toBe('v2.9.3')
+    expect(result).toBe('v2.9.3+abc123')
   })
 
   it('should return explicit version string as-is', async () => {
@@ -82,22 +100,17 @@ describe('resolveVersion', () => {
 
     expect(result).toBe('v1.5.0')
   })
+
+  it('should return explicit version without prefix string as-is', async () => {
+    const result = await resolveVersion('3.0.0')
+
+    expect(result).toBe('3.0.0')
+  })
 })
 
 // ─── getServerVersion ───────────────────────────────────────────────
 
 describe('getServerVersion', () => {
-  it('should strip build metadata from version', async () => {
-    const mockResponse = {
-      json: vi.fn().mockResolvedValue({ Version: 'v2.9.3+abc123' }),
-    } as unknown as Response
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
-
-    const result = await getServerVersion('https://argocd.example.com')
-
-    expect(result).toBe('v2.9.3')
-  })
-
   it('should return version without build metadata as-is', async () => {
     const mockResponse = {
       json: vi.fn().mockResolvedValue({ Version: 'v2.9.3' }),
@@ -107,6 +120,28 @@ describe('getServerVersion', () => {
     const result = await getServerVersion('https://argocd.example.com')
 
     expect(result).toBe('v2.9.3')
+  })
+
+  it('should return version with build metadata unchanged', async () => {
+    const mockResponse = {
+      json: vi.fn().mockResolvedValue({ Version: 'v2.9.3+abc123' }),
+    } as unknown as Response
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
+
+    const result = await getServerVersion('https://argocd.example.com')
+
+    expect(result).toBe('v2.9.3+abc123')
+  })
+
+  it('should throw when server response is not valid JSON', async () => {
+    const mockResponse = {
+      json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token < in JSON')),
+    } as unknown as Response
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
+
+    await expect(getServerVersion('https://argocd.example.com')).rejects.toThrow(
+      'Failed to resolve version from server https://argocd.example.com',
+    )
   })
 
   it('should throw when fetch fails', async () => {
@@ -142,7 +177,7 @@ describe('run', () => {
 
     await run()
 
-    expect(mockInstallTool).toHaveBeenCalledWith('argocd', 'v2.10.0', expect.stringContaining('v2.10.0'), false)
+    expect(mockInstallTool).toHaveBeenCalledWith('argocd', '2.10.0', expect.stringContaining('v2.10.0'), false)
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
   })
 
@@ -154,7 +189,7 @@ describe('run', () => {
     await run()
 
     expect(mockGetLatestVersion).toHaveBeenCalledWith('argoproj/argo-cd')
-    expect(mockInstallTool).toHaveBeenCalledWith('argocd', 'v2.14.0', expect.stringContaining('v2.14.0'), false)
+    expect(mockInstallTool).toHaveBeenCalledWith('argocd', '2.14.0', expect.stringContaining('v2.14.0'), false)
   })
 
   it('should set ARGOCD_OPTS when options input is provided', async () => {
@@ -196,6 +231,37 @@ describe('run', () => {
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'download failed')
   })
 
+  it('should strip build metadata from explicit version input', async () => {
+    mockedTask.getInput.mockImplementation((name: string) => {
+      if (name === 'version') return 'v2.9.3+abc123'
+      return undefined
+    })
+    mockInstallTool.mockResolvedValue(undefined)
+
+    await run()
+
+    expect(mockInstallTool).toHaveBeenCalledWith('argocd', '2.9.3', expect.stringContaining('v2.9.3'), false)
+    expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
+  })
+
+  it('should set env vars from service connection when version is not server', async () => {
+    mockedTask.getInput.mockImplementation((name: string) => {
+      if (name === 'version') return 'v2.10.0'
+      if (name === 'connection') return 'myconn'
+      return undefined
+    })
+    mockedTask.getEndpointUrlRequired.mockReturnValue('https://argocd.example.com')
+    mockedTask.getEndpointAuthorizationParameterRequired.mockReturnValue('token123')
+    mockInstallTool.mockResolvedValue(undefined)
+
+    await run()
+
+    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_SERVER', 'argocd.example.com')
+    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_AUTH_TOKEN', 'token123', true)
+    expect(mockInstallTool).toHaveBeenCalledWith('argocd', '2.10.0', expect.stringContaining('v2.10.0'), false)
+    expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
+  })
+
   it('should fail when version is requested without service connection', async () => {
     mockedTask.getInput.mockImplementation((name: string) => {
       if (name === 'version') return 'server'
@@ -230,7 +296,7 @@ describe('run', () => {
 
     expect(mockInstallTool).toHaveBeenCalledWith(
       'argocd',
-      'v2.9.3',
+      '2.9.3',
       'https://argocd.example.com/download/argocd-linux-amd64',
       false,
     )
@@ -260,12 +326,12 @@ describe('run', () => {
     expect(mockInstallTool).toHaveBeenNthCalledWith(
       1,
       'argocd',
-      'v2.9.3',
+      '2.9.3',
       'https://argocd.example.com/download/argocd-linux-amd64',
       false,
     )
-    expect(mockInstallTool).toHaveBeenNthCalledWith(2, 'argocd', 'v2.9.3', expect.stringContaining('v2.9.3'), false)
-    expect(mockedTask.warning).toHaveBeenCalledWith(expect.stringContaining('v2.9.3'))
+    expect(mockInstallTool).toHaveBeenNthCalledWith(2, 'argocd', '2.9.3', expect.stringContaining('v2.9.3'), false)
+    expect(mockedTask.warning).toHaveBeenCalledWith(expect.stringContaining('2.9.3'))
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
   })
 
@@ -313,6 +379,35 @@ describe('run', () => {
 
     expect(mockInstallTool).toHaveBeenCalledTimes(2)
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'github also failed')
+  })
+
+  it('should use Windows-specific binary name on Windows platform', async () => {
+    // downloadFileName is computed at module load time, so a fresh import is needed
+    const winInstallTool = vi.fn().mockResolvedValue(undefined)
+    vi.resetModules()
+    vi.doMock('@bonddim/utils', () => ({
+      getLatestVersion: vi.fn(),
+      installTool: winInstallTool,
+      isWindows: vi.fn().mockReturnValue(true),
+      isHttpError: (error: unknown) => error instanceof Error && 'httpStatusCode' in error,
+    }))
+
+    const { run: winRun } = await import('../src/run')
+
+    mockedTask.getInput.mockImplementation((name: string) => {
+      if (name === 'version') return 'v2.10.0'
+      return undefined
+    })
+
+    await winRun()
+
+    expect(winInstallTool).toHaveBeenCalledWith(
+      'argocd',
+      '2.10.0',
+      expect.stringContaining('argocd-windows-amd64.exe'),
+      false,
+    )
+    expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
   })
 
   it('should fail fast when server version resolution fails', async () => {

@@ -1,13 +1,17 @@
-# Argo CD CLI Extension
+# Argo CD CLI Extension Changelog
 
-## 1.3.3
+## 1.0.0
 
-### Patch Changes
+### Task Changes
 
-- 52ef993: Update readme
+* Removed hardcoded fallback version - version resolution failures now surface as explicit errors instead of silently installing a pinned release.
+* Task fails early when `version` is set to `server` but no service connection is provided.
+* Install ArgoCD CLI directly from the connected server's download endpoint when `version` is set to `server`. Automatically falls back to the GitHub release if the server endpoint is not accessible.
+* `ARGOCD_AUTH_TOKEN` pipeline variable is now set as a secret.
 
-## 1.3.2
+### Internal Changes
 
-### Patch Changes
-
-- Bump patch
+* Migrated to pnpm monorepo workspace.
+* Switched build tooling from `tsc` to esbuild (bundled single-file output) and removing `node_modules` from the final vsix package.
+* Replaced Jest with Vitest.
+* Replaced ESLint+Prettier with Biome.

@@ -4,9 +4,9 @@
   "name": "ArgoCDInstaller",
   "friendlyName": "Argo CD CLI Installer",
   "description": "Install Argo CD CLI on pipeline agents",
-  "helpUrl": "https://github.com/bonddim/azure-pipelines-tools-extension/blob/main/tasks/ArgoCDInstaller/README.md",
-  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-pipelines-tools-extension/blob/main/tasks/ArgoCDInstaller/README.md)",
-  "category": "Utility",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md)",
+  "category": "Azure Pipelines",
   "author": "Dmytro Bondar",
   "version": {
     "Major": 0,
@@ -18,7 +18,7 @@
   "inputs": [
     {
       "name": "connection",
-      "type": "connectedService:35ca8d64-1eed-11f1-8fe5-00155d25990c",
+      "type": "connectedService:ArgoCDServer",
       "label": "Argo CD Server Connection",
       "defaultValue": "",
       "required": false,
@@ -40,7 +40,18 @@
       "helpMarkDown": "Specify arguments for **ARGOCD_OPTS** variable, eg. `--grpc-web --insecure`"
     }
   ],
+  "restrictions": {
+    "commands": {
+      "mode": "restricted"
+    },
+    "settableVariables": {
+      "allowed": ["PATH", "ARGOCD_SERVER", "ARGOCD_AUTH_TOKEN", "ARGOCD_OPTS"]
+    }
+  },
   "execution": {
+    "Node24": {
+      "target": "dist/index.js"
+    },
     "Node20_1": {
       "target": "dist/index.js"
     }

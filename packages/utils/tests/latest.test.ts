@@ -13,26 +13,26 @@ describe('getLatestVersion', () => {
     expect(result).toBe('v2.10.0')
   })
 
-  it('should return empty string when location header is null', async () => {
+  it('should throw when location header is null', async () => {
     const mockResponse = {
       headers: { get: vi.fn().mockReturnValue(null) },
     } as unknown as Response
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
 
-    const result = await getLatestVersion('owner/repository')
-
-    expect(result).toBe('')
+    await expect(getLatestVersion('owner/repository')).rejects.toThrow(
+      'Failed to resolve latest version from owner/repository',
+    )
   })
 
-  it('should return empty string when location header ends with empty segment', async () => {
+  it('should throw when location header ends with empty segment', async () => {
     const mockResponse = {
       headers: { get: vi.fn().mockReturnValue('https://github.com/owner/repository/releases/tag/') },
     } as unknown as Response
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
 
-    const result = await getLatestVersion('owner/repository')
-
-    expect(result).toBe('')
+    await expect(getLatestVersion('owner/repository')).rejects.toThrow(
+      'Failed to resolve latest version from owner/repository',
+    )
   })
 
   it('should call fetch with redirect manual and HEAD method', async () => {

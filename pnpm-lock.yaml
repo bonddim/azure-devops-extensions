@@ -21,9 +21,6 @@ importers:
       '@biomejs/biome':
         specifier: 2.4.7
         version: 2.4.7
-      '@changesets/changelog-git':
-        specifier: ^0.2.1
-        version: 0.2.1
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.30.0(@types/node@24.12.0)

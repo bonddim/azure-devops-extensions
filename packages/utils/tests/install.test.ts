@@ -41,7 +41,10 @@ describe('installTool', () => {
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool', false)
 
-      expect(toolLib.downloadTool).toHaveBeenCalledWith('https://example.com/mytool')
+      expect(toolLib.downloadTool).toHaveBeenCalledWith('https://example.com/mytool', undefined, undefined, {
+        'User-Agent': 'AzureDevOps',
+        connection: 'close',
+      })
       expect(fs.promises.chmod).toHaveBeenCalledWith('/tmp/mytool', 0o755)
       expect(toolLib.cacheFile).toHaveBeenCalledWith('/tmp/mytool', 'mytool', 'mytool', '1.0.0')
       expect(toolLib.prependPath).toHaveBeenCalledWith('/cached/mytool')

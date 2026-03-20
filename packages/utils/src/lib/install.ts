@@ -31,7 +31,10 @@ export async function installTool(tool: string, version: string, downloadUrl: st
 
   if (!cachedPath) {
     try {
-      const filePath = await toolLib.downloadTool(downloadUrl)
+      const filePath = await toolLib.downloadTool(downloadUrl, undefined, undefined, {
+        connection: 'close',
+        'User-Agent': 'AzureDevOps',
+      })
       const fileExtension = path.extname(new URL(downloadUrl).pathname.toLowerCase())
 
       cachedPath = extract

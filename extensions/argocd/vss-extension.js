@@ -6,19 +6,19 @@ const base = buildManifest()
 function manifest() {
   return {
     ...base,
-    id: 'argocd-installer-test',
+    id: 'argocd-installer',
     public: true,
-    name: 'Argo CD CLI Installer TEST',
-    description: 'Argo CD CLI Installer Task for Azure DevOps',
+    name: 'Argo CD CLI Extension',
+    description: 'Argo CD CLI Extension for Azure DevOps',
     version,
     contributions: [
       ...base.contributions,
       {
-        id: '91625250-22db-11f1-93a5-00155df413f0',
+        id: 'service-endpoint',
         type: 'ms.vss-endpoint.service-endpoint-type',
         targets: ['ms.vss-endpoint.endpoint-types'],
         properties: {
-          name: '35ca8d64-1eed-11f1-8fe5-00155d25990c',
+          name: 'ArgoCDServer',
           displayName: 'Argo CD Server',
           url: {
             displayName: 'Argo CD Server URL',

@@ -1,6 +1,7 @@
 import * as os from 'node:os'
 import * as utils from '@bonddim/utils'
-import * as task from 'azure-pipelines-task-lib/task'
+import * as taskLib from 'azure-pipelines-task-lib/task'
+import { cleanVersion } from 'azure-pipelines-tool-lib/tool'
 
 const toolName = 'argocd'
 const repo = 'argoproj/argo-cd'
@@ -15,9 +16,9 @@ const downloadFileName = `${toolName}-${utils.isWindows() ? 'windows' : os.platf
  */
 export async function run() {
   try {
-    const inputConnection = task.getInput('connection', false)
-    const inputVersion = task.getInput('version') ?? 'latest'
-    const inputOpts = task.getInput('options')
+    const inputConnection = taskLib.getInput('connection', false)
+    const inputVersion = taskLib.getInput('version') ?? 'latest'
+    const inputOpts = taskLib.getInput('options')
 
     // Validate inputs and fail early if required parameters are missing
     if (inputVersion.toLowerCase() === 'server' && !inputConnection) {
@@ -26,28 +27,29 @@ export async function run() {
 
     // Set ARGOCD_OPTS if provided, allowing users to specify additional options for the ArgoCD CLI
     if (inputOpts) {
-      task.debug(`Setting ARGOCD_OPTS to ${inputOpts}`)
-      task.setVariable('ARGOCD_OPTS', inputOpts)
+      taskLib.debug(`Setting ARGOCD_OPTS to ${inputOpts}`)
+      taskLib.setVariable('ARGOCD_OPTS', inputOpts)
     }
 
     // Get server URL if a service connection is provided
     const serverUrl = inputConnection ? getEndpointDetails(inputConnection) : undefined
 
     // Resolve version — throws on failure (no fallback)
-    const version = await resolveVersion(inputVersion, serverUrl)
+    const resolvedVersion = await resolveVersion(inputVersion, serverUrl)
+    const version = cleanVersion(resolvedVersion) || resolvedVersion
 
     // Install the tool, preferring the server download endpoint when version is set to 'server' and falling back to GitHub releases on failure
     if (inputVersion.toLowerCase() === 'server' && serverUrl) {
       await installFromServer(version, serverUrl)
     } else {
-      await utils.installTool(toolName, version, `${githubDownloadUrl}/${version}/${downloadFileName}`, false)
+      await utils.installTool(toolName, version, `${githubDownloadUrl}/v${version}/${downloadFileName}`, false)
     }
 
     // Verify installation by checking the version of the installed tool
-    task.execSync(toolName, 'version --client')
-    task.setResult(task.TaskResult.Succeeded, '')
+    taskLib.execSync(toolName, 'version --client')
+    taskLib.setResult(taskLib.TaskResult.Succeeded, '')
   } catch (error) {
-    task.setResult(task.TaskResult.Failed, (error as Error).message)
+    taskLib.setResult(taskLib.TaskResult.Failed, (error as Error).message)
   }
 }
 
@@ -64,11 +66,10 @@ async function installFromServer(version: string, serverUrl: string): Promise<vo
   try {
     await utils.installTool(toolName, version, serverDownloadUrl, false)
   } catch (error) {
-    if (!utils.isHttpError(error)) {
-      throw error
-    }
-    task.warning(`Server download URL not accessible, falling back to GitHub release for ${version}`)
-    await utils.installTool(toolName, version, `${githubDownloadUrl}/${version}/${downloadFileName}`, false)
+    if (!utils.isHttpError(error)) throw error
+
+    taskLib.warning(`Server download URL not accessible, falling back to GitHub release for ${version}`)
+    await utils.installTool(toolName, version, `${githubDownloadUrl}/v${version}/${downloadFileName}`, false)
   }
 }
 
@@ -80,13 +81,13 @@ async function installFromServer(version: string, serverUrl: string): Promise<vo
  * @returns Normalized base server URL including non-root path, if present.
  */
 export function getEndpointDetails(connectionEndpoint: string): string {
-  const serverUrl = task.getEndpointUrlRequired(connectionEndpoint)
-  const apitoken = task.getEndpointAuthorizationParameterRequired(connectionEndpoint, 'apitoken')
+  const serverUrl = taskLib.getEndpointUrlRequired(connectionEndpoint)
+  const apitoken = taskLib.getEndpointAuthorizationParameterRequired(connectionEndpoint, 'apitoken')
   const url = new URL(serverUrl)
   const path = url.pathname === '/' ? '' : url.pathname
 
-  task.setVariable('ARGOCD_SERVER', url.host + path)
-  task.setVariable('ARGOCD_AUTH_TOKEN', apitoken, true)
+  taskLib.setVariable('ARGOCD_SERVER', url.host + path)
+  taskLib.setVariable('ARGOCD_AUTH_TOKEN', apitoken, true)
   return new URL(url.pathname, url.origin).href
 }
 
@@ -98,7 +99,7 @@ export function getEndpointDetails(connectionEndpoint: string): string {
  * @returns Resolved version string to install.
  */
 export async function resolveVersion(inputVersion: string, serverUrl?: string): Promise<string> {
-  task.debug(`Requested version: ${inputVersion}`)
+  taskLib.debug(`Requested version: ${inputVersion}`)
 
   switch (inputVersion.toLowerCase()) {
     case 'latest':
@@ -118,20 +119,24 @@ export async function resolveVersion(inputVersion: string, serverUrl?: string): 
  * @returns Server-reported semantic version without build metadata.
  */
 export async function getServerVersion(url: string): Promise<string> {
-  task.debug(`Resolving version from: ${url}`)
+  taskLib.debug(`Resolving version from: ${url}`)
 
   try {
     const versionUrl = new URL('api/version', url).href
-    const response = await fetch(new Request(versionUrl, { method: 'GET' }))
+    const response = await fetch(
+      new Request(versionUrl, {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          connection: 'close',
+        },
+      }),
+    )
     const data = (await response.json()) as { Version?: string }
-    const versionFull = data.Version
-    const version = versionFull?.split('+')[0]
+    const version = data.Version
+    if (!version) throw new Error(`Failed to parse version from server ${url}`)
 
-    if (!version) {
-      throw new Error(`Failed to parse version from server ${url}`)
-    }
-
-    task.debug(`Resolved version: ${version}`)
+    taskLib.debug(`Resolved version: ${version}`)
     return version
   } catch (error) {
     throw new Error(`Failed to resolve version from server ${url}`, { cause: error })
