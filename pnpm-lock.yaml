@@ -58,6 +58,12 @@ importers:
         specifier: workspace:*
         version: link:../../packages/utils
 
+  extensions/terramate:
+    dependencies:
+      '@bonddim/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+
   packages/utils: {}
 
 packages:

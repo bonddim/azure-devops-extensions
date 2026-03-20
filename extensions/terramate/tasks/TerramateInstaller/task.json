@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "fd1fc9ba-5f5d-11f0-9430-00155d997860",
+  "name": "TerramateInstaller",
+  "friendlyName": "Terramate CLI Installer",
+  "description": "Install Terramate CLI",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md)",
+  "category": "Azure Pipelines",
+  "author": "Dmytro Bondar",
+  "version": {
+    "Major": 0,
+    "Minor": 2,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Install Terramate CLI",
+  "inputs": [
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Terramate CLI Version",
+      "defaultValue": "latest",
+      "required": false,
+      "helpMarkDown": "Version of Terramate CLI to install. If not specified, latest will be installed"
+    }
+  ],
+  "restrictions": {
+    "commands": {
+      "mode": "restricted"
+    },
+    "settableVariables": {
+      "allowed": ["PATH"]
+    }
+  },
+  "execution": {
+    "Node24": {
+      "target": "dist/index.js"
+    },
+    "Node20_1": {
+      "target": "dist/index.js"
+    }
+  }
+}
