@@ -7,7 +7,7 @@
     "prebuild": "pnpm --filter ./packages/* exec tsc --build",
     "build": "pnpm --filter ./extensions/* exec node ../../tools/build-tasks.mjs",
     "package": "pnpm --filter ./extensions/* exec tfx extension create --manifest-js vss-extension.js",
-    "publish": "pnpm --filter ./extensions/* exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN"
+    "publish": "pnpm --filter '...{extensions}[origin/main]' exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm biome check --fix"
