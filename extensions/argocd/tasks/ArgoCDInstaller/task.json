@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "bf9f5d10-e985-11ef-80f2-00155de5031d",
+  "name": "ArgoCDInstaller",
+  "friendlyName": "Argo CD CLI Installer",
+  "description": "Install Argo CD CLI on pipeline agents",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md)",
+  "category": "Azure Pipelines",
+  "author": "Dmytro Bondar",
+  "version": {
+    "Major": 0,
+    "Minor": 2,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Install Argo CD CLI",
+  "inputs": [
+    {
+      "name": "connection",
+      "type": "connectedService:ArgoCDServer",
+      "label": "Argo CD Server Connection",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Select the Argo CD Server Connection to use"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Argo CD CLI Version",
+      "defaultValue": "latest",
+      "required": false,
+      "helpMarkDown": "Version of Argo CD CLI to install. If not specified, latest will be installed"
+    },
+    {
+      "name": "options",
+      "type": "string",
+      "label": "ArgoCD CLI Options",
+      "required": false,
+      "helpMarkDown": "Specify arguments for **ARGOCD_OPTS** variable, eg. `--grpc-web --insecure`"
+    }
+  ],
+  "restrictions": {
+    "commands": {
+      "mode": "restricted"
+    },
+    "settableVariables": {
+      "allowed": ["PATH", "ARGOCD_SERVER", "ARGOCD_AUTH_TOKEN", "ARGOCD_OPTS"]
+    }
+  },
+  "execution": {
+    "Node24": {
+      "target": "dist/index.js"
+    },
+    "Node20_1": {
+      "target": "dist/index.js"
+    }
+  }
+}
