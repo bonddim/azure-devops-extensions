@@ -10,6 +10,7 @@ function manifest() {
     public: true,
     name: 'Argo CD CLI Extension',
     description: 'Argo CD CLI Extension for Azure DevOps',
+    tags: ['argocd', 'argo cd', 'gitops', 'devops'],
     version,
     contributions: [
       ...base.contributions,
