@@ -6,9 +6,9 @@
     "typecheck": "tsc --build --emitDeclarationOnly",
     "test": "vitest",
     "prebuild": "pnpm --filter ./packages/* exec tsc --build",
-    "build": "pnpm --filter '...{extensions}[origin/main]' exec node ../../tools/build-tasks.mjs",
-    "package": "pnpm --filter '...{extensions}[origin/main]' exec tfx extension create --manifest-js vss-extension.js",
-    "publish": "pnpm --filter '...{extensions}[origin/main]' exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN"
+    "build": "pnpm --filter {extensions}[${PNPM_BASE:-origin/main}] exec node ../../tools/build-tasks.mjs",
+    "package": "pnpm --filter {extensions}[${PNPM_BASE:-origin/main}] exec tfx extension create --manifest-js vss-extension.js",
+    "publish": "pnpm --filter {extensions}[${PNPM_BASE:-origin/main}] exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN --no-wait-validation"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm biome check --fix"

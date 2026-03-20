@@ -12,6 +12,16 @@ function manifest() {
     description: 'Terramate extension for Azure DevOps',
     tags: ['terramate', 'terraform', 'iac', 'devops'],
     version,
+    contributions: [
+      {
+        id: 'terramate-installer-task',
+        type: 'ms.vss-distributed-task.task',
+        targets: ['ms.vss-distributed-task.tasks'],
+        properties: {
+          name: 'tasks/TerramateInstaller',
+        },
+      },
+    ],
   }
 }
 console.log('Final manifest:\n', JSON.stringify(manifest(), null, 2))

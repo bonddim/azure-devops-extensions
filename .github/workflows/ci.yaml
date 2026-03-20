@@ -12,6 +12,8 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      PNPM_BASE: ${{ github.event_name == 'push' && 'HEAD~1' || 'origin/main' }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -24,6 +26,7 @@ jobs:
           version: 10
           cache: true
 
+      - run: git fetch origin main
       - run: pnpm install --ignore-scripts --prefer-offline
       - run: pnpm biome ci
       - run: pnpm run typecheck

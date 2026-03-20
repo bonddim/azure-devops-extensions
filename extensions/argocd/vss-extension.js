@@ -13,7 +13,6 @@ function manifest() {
     tags: ['argocd', 'argo cd', 'gitops', 'devops'],
     version,
     contributions: [
-      ...base.contributions,
       {
         id: 'service-endpoint',
         type: 'ms.vss-endpoint.service-endpoint-type',
@@ -26,6 +25,15 @@ function manifest() {
             helpText: 'URL for the Argo CD Server to connect to.',
           },
           authenticationSchemes: [{ type: 'ms.vss-endpoint.endpoint-auth-scheme-token' }],
+        },
+      },
+      {
+        id: 'installer-task',
+        description: 'Argo CD CLI Installer',
+        type: 'ms.vss-distributed-task.task',
+        targets: ['ms.vss-distributed-task.tasks'],
+        properties: {
+          name: 'tasks/ArgoCDInstaller',
         },
       },
     ],
