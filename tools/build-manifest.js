@@ -59,7 +59,7 @@ function buildManifest() {
   // Update patch version in task.json files if environment variable is set
   if (process.env.GITHUB_RUN_NUMBER) {
     console.log('Patching task versions with GITHUB_RUN_NUMBER:', process.env.GITHUB_RUN_NUMBER)
-    patchTaskVersions(taskJsonPaths, parseInt(process.env.GITHUB_RUN_NUMBER, 10))
+    patchTaskVersions(taskJsonPaths, Number.parseInt(process.env.GITHUB_RUN_NUMBER, 10))
   }
 
   return {
