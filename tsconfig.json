@@ -7,6 +7,9 @@
     },
     {
       "path": "extensions/argocd/tasks/ArgoCDInstaller"
+    },
+    {
+      "path": "extensions/toolbox/tasks/GitHubToolInstaller"
     }
   ]
 }

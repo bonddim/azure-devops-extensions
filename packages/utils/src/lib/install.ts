@@ -25,8 +25,15 @@ export function isHttpError(error: unknown): boolean {
  * @param version tool version to install
  * @param downloadUrl url of tool to download
  * @param extract whether the downloaded file is an archive that needs extraction
+ * @param validate optional async callback to validate the downloaded file before caching
  */
-export async function installTool(tool: string, version: string, downloadUrl: string, extract: boolean): Promise<void> {
+export async function installTool(
+  tool: string,
+  version: string,
+  downloadUrl: string,
+  extract: boolean,
+  validate?: (filePath: string) => Promise<void>,
+): Promise<void> {
   let cachedPath = toolLib.findLocalTool(tool, version)
 
   if (!cachedPath) {
@@ -35,6 +42,11 @@ export async function installTool(tool: string, version: string, downloadUrl: st
         connection: 'close',
         'User-Agent': 'AzureDevOps',
       })
+
+      if (validate) {
+        await validate(filePath)
+      }
+
       const fileExtension = path.extname(new URL(downloadUrl).pathname.toLowerCase())
 
       cachedPath = extract

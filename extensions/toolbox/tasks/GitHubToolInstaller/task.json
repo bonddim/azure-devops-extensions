@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "914668a7-6bf4-460f-bca3-83db76741c0c",
+  "name": "GitHubToolInstaller",
+  "friendlyName": "GitHub Tool Installer",
+  "description": "Install any tool from GitHub releases",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/toolbox/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/toolbox/README.md)",
+  "category": "Azure Pipelines",
+  "author": "Dmytro Bondar",
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 0
+  },
+  "minimumAgentVersion": "3.232.1",
+  "instanceNameFormat": "Install $(repository)",
+  "inputs": [
+    {
+      "name": "repository",
+      "type": "string",
+      "label": "GitHub Repository",
+      "required": true,
+      "helpMarkDown": "GitHub repository in `owner/repo` format (e.g., `cli/cli`)"
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "label": "Version",
+      "defaultValue": "latest",
+      "required": false,
+      "helpMarkDown": "Version to install: `latest`, exact version (`v1.2.3`), or semver range (`1.0.x`, `~1.2.0`, `^1.0.0`)"
+    },
+    {
+      "name": "githubConnection",
+      "type": "connectedService:github",
+      "label": "GitHub Connection",
+      "required": false,
+      "helpMarkDown": "GitHub service connection for authentication. Required if `GITHUB_TOKEN` environment variable is not set"
+    },
+    {
+      "name": "filePattern",
+      "type": "string",
+      "label": "File Pattern",
+      "required": false,
+      "helpMarkDown": "Glob pattern to filter release assets when auto-detection finds multiple matches (e.g., `mytool_*`)"
+    }
+  ],
+  "restrictions": {
+    "commands": {
+      "mode": "restricted"
+    },
+    "settableVariables": {
+      "allowed": ["PATH"]
+    }
+  },
+  "execution": {
+    "Node24": {
+      "target": "dist/index.js"
+    },
+    "Node20_1": {
+      "target": "dist/index.js"
+    }
+  }
+}

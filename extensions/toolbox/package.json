@@ -1,0 +1,8 @@
+{
+  "name": "toolbox",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@bonddim/utils": "workspace:*"
+  }
+}

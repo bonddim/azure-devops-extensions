@@ -131,6 +131,52 @@ describe('installTool', () => {
     })
   })
 
+  describe('validate callback', () => {
+    it('calls validate after download and before caching', async () => {
+      const callOrder: string[] = []
+      vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
+      vi.mocked(toolLib.downloadTool).mockImplementation(async () => {
+        callOrder.push('download')
+        return '/tmp/mytool'
+      })
+      vi.mocked(os.platform).mockReturnValue('linux')
+      vi.mocked(fs.promises.chmod).mockResolvedValue(undefined)
+      vi.mocked(toolLib.cacheFile).mockImplementation(async () => {
+        callOrder.push('cache')
+        return '/cached/mytool'
+      })
+
+      const validate = vi.fn().mockImplementation(async () => {
+        callOrder.push('validate')
+      })
+
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate)
+
+      expect(validate).toHaveBeenCalledWith('/tmp/mytool')
+      expect(callOrder).toEqual(['download', 'validate', 'cache'])
+    })
+
+    it('does not call validate when tool is cached', async () => {
+      vi.mocked(toolLib.findLocalTool).mockReturnValue('/cached/mytool')
+      const validate = vi.fn()
+
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate)
+
+      expect(validate).not.toHaveBeenCalled()
+    })
+
+    it('propagates validate callback errors', async () => {
+      vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool')
+      const validate = vi.fn().mockRejectedValue(new Error('checksum mismatch'))
+
+      const error = await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate).catch((e) => e)
+
+      expect(error.message).toBe('Failed to install tool mytool version 1.0.0 from https://example.com/mytool')
+      expect(error.cause.message).toBe('checksum mismatch')
+    })
+  })
+
   describe('error handling', () => {
     it('re-throws HTTP errors from downloadTool directly without wrapping', async () => {
       const httpError = Object.assign(new Error('Unexpected HTTP response: 404'), { httpStatusCode: 404 })
