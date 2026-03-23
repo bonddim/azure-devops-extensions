@@ -1,8 +1,22 @@
 const { globSync } = require('glob')
 const { readFileSync, writeFileSync, rmSync } = require('node:fs')
-const { dirname, basename } = require('node:path')
+const { dirname, basename, join } = require('node:path')
 
 const repository = 'https://github.com/bonddim/azure-devops-extensions'
+
+// Pre-read and merge lib.json from both libraries once, since they are the same for all tasks
+const taskLib = JSON.parse(readFileSync(require.resolve('azure-pipelines-task-lib/lib.json'), 'utf-8'))
+const toolLib = JSON.parse(readFileSync(require.resolve('azure-pipelines-tool-lib/lib.json'), 'utf-8'))
+const mergedLib = JSON.stringify({ messages: { ...taskLib.messages, ...toolLib.messages } }, null, 2)
+/**
+ * Merges lib.json from azure-pipelines-task-lib and azure-pipelines-tool-lib into each task's dist/ directory.
+ * @param {string[]} taskJsonPaths - array of paths to task.json files
+ */
+function writeLibJson(taskJsonPaths) {
+  for (const taskJsonPath of taskJsonPaths) {
+    writeFileSync(join(dirname(taskJsonPath), 'dist', 'lib.json'), mergedLib)
+  }
+}
 
 /**
  * Removes any existing .vsix files in the extension directory to ensure a clean slate for the new version.
@@ -53,7 +67,8 @@ function buildManifest() {
   rmPrevious()
 
   const taskJsonPaths = globSync('tasks/*/task.json')
-  const taskFiles = globSync('tasks/*/{task.json,icon.png,dist/index.js}')
+  writeLibJson(taskJsonPaths)
+  const taskFiles = globSync('tasks/*/{task.json,icon.png,dist/index.js,dist/lib.json}')
 
   // Update patch version in task.json files if environment variable is set
   if (process.env.GITHUB_RUN_NUMBER) {
@@ -67,7 +82,6 @@ function buildManifest() {
     publisher: 'bonddim',
     categories: ['Azure Pipelines'],
     icons: { default: 'icon.png' },
-    galleryFlags: ['Preview'],
     content: {
       changelog: { path: 'CHANGELOG.md' },
       details: { path: 'README.md' },

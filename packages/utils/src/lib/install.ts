@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
+import * as taskLib from 'azure-pipelines-task-lib/task'
 import * as toolLib from 'azure-pipelines-tool-lib/tool'
 
 /**
@@ -35,6 +36,7 @@ export async function installTool(tool: string, version: string, downloadUrl: st
         connection: 'close',
         'User-Agent': 'AzureDevOps',
       })
+
       const fileExtension = path.extname(new URL(downloadUrl).pathname.toLowerCase())
 
       cachedPath = extract
@@ -46,7 +48,26 @@ export async function installTool(tool: string, version: string, downloadUrl: st
     }
   }
 
+  // Add the tool to PATH
   toolLib.prependPath(cachedPath)
+  // Verify tool is on PATH after installation
+  taskLib.which(tool, true)
+}
+
+/**
+ * Find the directory inside an extracted archive that contains the tool executable.
+ * Archives could place the binary in a nested directory (e.g. `tool-1.0/bin/tool`).
+ * Falls back to `baseDir` if the executable is not found.
+ *
+ * @param baseDir root of the extracted archive
+ * @param toolName tool name to look for (`.exe` is appended automatically on Windows)
+ * @returns directory that contains the executable, or `baseDir` if not found
+ */
+function findToolDir(baseDir: string, toolName: string): string {
+  const execName = isWindows() ? `${toolName}.exe` : toolName
+  const match = taskLib.find(baseDir).find((p) => path.basename(p) === execName && fs.statSync(p).isFile())
+  taskLib.debug(`Searching for ${execName} in ${baseDir}, found: ${match}`)
+  return match ? path.dirname(match) : baseDir
 }
 
 /**
@@ -69,7 +90,7 @@ async function installFromArchive(filePath: string, tool: string, version: strin
     extractPath = await toolLib.extractTar(filePath)
   }
 
-  return toolLib.cacheDir(extractPath, tool, version)
+  return toolLib.cacheDir(findToolDir(extractPath, tool), tool, version)
 }
 
 /**

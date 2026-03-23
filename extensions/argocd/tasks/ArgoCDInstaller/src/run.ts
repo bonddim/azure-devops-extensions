@@ -87,7 +87,9 @@ export function getEndpointDetails(connectionEndpoint: string): string {
   const path = url.pathname === '/' ? '' : url.pathname
 
   taskLib.setVariable('ARGOCD_SERVER', url.host + path)
-  taskLib.setVariable('ARGOCD_AUTH_TOKEN', apitoken, true)
+  // Store the API token in a variable for use in subsequent API calls
+  // but do not mark it as secret since calling argocd CLI commands will require it to be passed in plaintext via ARGOCD_AUTH_TOKEN environment variable
+  taskLib.setVariable('ARGOCD_AUTH_TOKEN', apitoken)
   const base = new URL(url.pathname, url.origin)
   if (!base.pathname.endsWith('/')) base.pathname += '/'
   return base.href
