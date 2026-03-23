@@ -6,7 +6,7 @@ const base = buildManifest()
 function manifest() {
   return {
     ...base,
-    id: 'toolbox',
+    id: '853934ee-2696-11f1-b8e6-00155d89217a',
     public: true,
     name: 'Toolbox',
     description: 'Azure Pipelines Toolbox',
