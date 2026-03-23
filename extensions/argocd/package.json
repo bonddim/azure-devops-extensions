@@ -1,6 +1,6 @@
 {
   "name": "argo-cd-cli-extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "build": "node ../../tools/build-tasks.mjs",

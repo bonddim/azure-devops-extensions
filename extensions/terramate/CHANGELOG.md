@@ -1,5 +1,11 @@
 # Terramate Extension Changelog
 
+## 1.0.2
+
+### Patch Changes
+
+- f17f8a1: fix: include libs default messages in lib.json
+
 ## 1.0.1
 
 ### Patch Changes
