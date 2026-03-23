@@ -5,7 +5,7 @@
     "changeset": "changeset",
     "typecheck": "tsc --build --emitDeclarationOnly",
     "test": "vitest",
-    "build": "pnpm  --filter ...[${PNPM_BASE:-origin/main}] run build",
+    "build": "pnpm  --filter ...[${PNPM_BASE:-origin/main}] --if-present run build",
     "package": "pnpm --filter ...[${PNPM_BASE:-origin/main}] --if-present run package",
     "publish": "pnpm --filter ...[${PNPM_BASE:-origin/main}] --if-present run publish"
   },
