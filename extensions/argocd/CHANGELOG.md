@@ -1,5 +1,12 @@
 # Argo CD CLI Extension Changelog
 
+## 1.0.2
+
+### Patch Changes
+
+- f17f8a1: fix: include libs default messages in lib.json
+- f17f8a1: fix: revert setting `ARGOCD_AUTH_TOKEN` as secret
+
 ## 1.0.1
 
 ### Patch Changes
