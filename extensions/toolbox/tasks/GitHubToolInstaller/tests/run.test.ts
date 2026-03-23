@@ -1,39 +1,25 @@
 import * as task from 'azure-pipelines-task-lib/task'
 import { describe, expect, it, vi } from 'vitest'
 
-const { mockInstallTool, mockDownloadChecksumFile, mockValidateChecksum, mockOctokitArgs, mockOctokit } = vi.hoisted(
-  () => {
-    return {
-      mockInstallTool:
-        vi.fn<
-          (
-            tool: string,
-            version: string,
-            url: string,
-            extract: boolean,
-            validate?: (filePath: string) => Promise<void>,
-          ) => Promise<void>
-        >(),
-      mockDownloadChecksumFile: vi.fn<(url: string) => Promise<Map<string, string>>>(),
-      mockValidateChecksum: vi.fn<(filePath: string, expectedHash: string) => Promise<void>>(),
-      mockOctokitArgs: { captured: undefined as unknown },
-      mockOctokit: {
-        rest: {
-          repos: {
-            getLatestRelease: vi.fn(),
-            getReleaseByTag: vi.fn(),
-            listReleases: vi.fn(),
-          },
+const { mockInstallTool, mockEvaluateVersions, mockOctokitArgs, mockOctokit } = vi.hoisted(() => {
+  return {
+    mockInstallTool: vi.fn<(tool: string, version: string, url: string, extract: boolean) => Promise<void>>(),
+    mockEvaluateVersions: vi.fn<(versions: string[], spec: string) => string>(),
+    mockOctokitArgs: { captured: undefined as unknown },
+    mockOctokit: {
+      rest: {
+        repos: {
+          getLatestRelease: vi.fn(),
+          getReleaseByTag: vi.fn(),
+          listReleases: vi.fn(),
         },
       },
-    }
-  },
-)
+    },
+  }
+})
 
 vi.mock('@bonddim/utils', () => ({
   installTool: mockInstallTool,
-  downloadChecksumFile: mockDownloadChecksumFile,
-  validateChecksum: mockValidateChecksum,
   isWindows: vi.fn().mockReturnValue(false),
 }))
 vi.mock('@octokit/rest', () => ({
@@ -45,10 +31,9 @@ vi.mock('@octokit/rest', () => ({
   },
 }))
 vi.mock('azure-pipelines-task-lib/task')
-vi.mock('azure-pipelines-tool-lib/tool', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('azure-pipelines-tool-lib/tool')>()
-  return { ...actual, findLocalTool: vi.fn() }
-})
+vi.mock('azure-pipelines-tool-lib/tool', () => ({
+  evaluateVersions: mockEvaluateVersions,
+}))
 
 const mockedTask = vi.mocked(task)
 
@@ -71,11 +56,6 @@ const LINUX_ASSETS = [
   makeAsset('tool-linux-arm64.tar.gz'),
 ]
 
-const ASSETS_WITH_CHECKSUMS = [
-  ...LINUX_ASSETS,
-  makeAsset('checksums.txt', 'https://github.com/releases/download/v1.0.0/checksums.txt'),
-]
-
 function mockRelease(tag: string, assets: ReturnType<typeof makeAsset>[]) {
   return { data: { tag_name: tag, assets } }
 }
@@ -85,26 +65,26 @@ function mockRelease(tag: string, assets: ReturnType<typeof makeAsset>[]) {
 describe('run', () => {
   describe('authentication', () => {
     it('should use GitHub service connection token', async () => {
-      mockInputs({ repository: 'owner/tool', version: 'latest', githubConnection: 'my-conn' })
-      mockedTask.getEndpointAuthorizationParameter.mockReturnValue('ghp_servicetoken')
+      mockInputs({ repository: 'owner/tool', version: 'latest', connection: 'my-conn' })
+      mockedTask.getEndpointAuthorizationParameter.mockReturnValue('gh_servicetoken')
       mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', LINUX_ASSETS))
       mockInstallTool.mockResolvedValue(undefined)
 
       await run()
 
-      expect(mockOctokitArgs.captured).toEqual({ auth: 'ghp_servicetoken' })
-      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, expect.any(String))
+      expect(mockOctokitArgs.captured).toEqual({ auth: 'gh_servicetoken' })
+      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, expect.any(String), true)
     })
 
     it('should fall back to GITHUB_TOKEN env var', async () => {
       mockInputs({ repository: 'owner/tool', version: 'latest' })
-      mockedTask.getVariable.mockReturnValue('ghp_envtoken')
+      mockedTask.getVariable.mockReturnValue('gh_envtoken')
       mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', LINUX_ASSETS))
       mockInstallTool.mockResolvedValue(undefined)
 
       await run()
 
-      expect(mockOctokitArgs.captured).toEqual({ auth: 'ghp_envtoken' })
+      expect(mockOctokitArgs.captured).toEqual({ auth: 'gh_envtoken' })
     })
 
     it('should fail when no authentication is available', async () => {
@@ -117,6 +97,7 @@ describe('run', () => {
       expect(mockedTask.setResult).toHaveBeenCalledWith(
         task.TaskResult.Failed,
         expect.stringContaining('GitHub authentication is required'),
+        true,
       )
     })
   })
@@ -131,7 +112,7 @@ describe('run', () => {
       await run()
 
       expect(mockOctokit.rest.repos.getLatestRelease).toHaveBeenCalledWith({ owner: 'owner', repo: 'tool' })
-      expect(mockInstallTool).toHaveBeenCalledWith('tool', '2.0.0', expect.any(String), true, undefined)
+      expect(mockInstallTool).toHaveBeenCalledWith('tool', '2.0.0', expect.any(String), true)
     })
 
     it('should call getReleaseByTag for exact version', async () => {
@@ -174,6 +155,7 @@ describe('run', () => {
     it('should use semver range matching for version ranges', async () => {
       mockInputs({ repository: 'owner/tool', version: '1.x' })
       mockedTask.getVariable.mockReturnValue('token')
+      mockEvaluateVersions.mockReturnValue('1.5.0')
       mockOctokit.rest.repos.listReleases.mockResolvedValue({
         data: [
           { tag_name: 'v2.0.0', draft: false, prerelease: false, assets: LINUX_ASSETS },
@@ -191,12 +173,13 @@ describe('run', () => {
         repo: 'tool',
         per_page: 100,
       })
-      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.5.0', expect.any(String), true, undefined)
+      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.5.0', expect.any(String), true)
     })
 
     it('should skip draft and prerelease when matching version ranges', async () => {
       mockInputs({ repository: 'owner/tool', version: '1.x' })
       mockedTask.getVariable.mockReturnValue('token')
+      mockEvaluateVersions.mockReturnValue('1.5.0')
       mockOctokit.rest.repos.listReleases.mockResolvedValue({
         data: [
           { tag_name: 'v1.6.0', draft: true, prerelease: false, assets: LINUX_ASSETS },
@@ -208,12 +191,13 @@ describe('run', () => {
 
       await run()
 
-      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.5.0', expect.any(String), true, undefined)
+      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.5.0', expect.any(String), true)
     })
 
     it('should fail when no release matches the version range', async () => {
       mockInputs({ repository: 'owner/tool', version: '3.x' })
       mockedTask.getVariable.mockReturnValue('token')
+      mockEvaluateVersions.mockReturnValue('')
       mockOctokit.rest.repos.listReleases.mockResolvedValue({
         data: [
           { tag_name: 'v2.0.0', draft: false, prerelease: false, assets: LINUX_ASSETS },
@@ -226,6 +210,7 @@ describe('run', () => {
       expect(mockedTask.setResult).toHaveBeenCalledWith(
         task.TaskResult.Failed,
         expect.stringContaining("No release found matching version range '3.x'"),
+        true,
       )
     })
   })
@@ -244,7 +229,6 @@ describe('run', () => {
         '1.0.0',
         expect.stringContaining('tool-linux-amd64.tar.gz'),
         true,
-        undefined,
       )
     })
 
@@ -257,13 +241,7 @@ describe('run', () => {
 
       await run()
 
-      expect(mockInstallTool).toHaveBeenCalledWith(
-        'tool',
-        '1.0.0',
-        expect.stringContaining('tool-linux-amd64'),
-        false,
-        undefined,
-      )
+      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.0.0', expect.stringContaining('tool-linux-amd64'), false)
     })
 
     it('should use filePattern to narrow down multiple matches', async () => {
@@ -284,7 +262,6 @@ describe('run', () => {
         '1.0.0',
         expect.stringContaining('tool-linux-amd64.tar.gz'),
         true,
-        undefined,
       )
     })
 
@@ -299,6 +276,7 @@ describe('run', () => {
       expect(mockedTask.setResult).toHaveBeenCalledWith(
         task.TaskResult.Failed,
         expect.stringContaining('No matching asset found'),
+        true,
       )
     })
 
@@ -313,10 +291,11 @@ describe('run', () => {
       expect(mockedTask.setResult).toHaveBeenCalledWith(
         task.TaskResult.Failed,
         expect.stringContaining('Multiple matching assets found'),
+        true,
       )
     })
 
-    it('should exclude checksum files from asset matching', async () => {
+    it('should not select checksum files as the tool asset', async () => {
       mockInputs({ repository: 'owner/tool' })
       mockedTask.getVariable.mockReturnValue('token')
       const assets = [
@@ -334,7 +313,85 @@ describe('run', () => {
         '1.0.0',
         expect.stringContaining('tool-linux-amd64.tar.gz'),
         true,
-        expect.any(Function),
+      )
+    })
+
+    it('should prefer musl over glibc when both linux assets present', async () => {
+      mockInputs({ repository: 'owner/tool' })
+      mockedTask.getVariable.mockReturnValue('token')
+      const assets = [
+        makeAsset('tool-linux-amd64.tar.gz'),
+        makeAsset('tool-linux-musl-amd64.tar.gz'),
+        makeAsset('tool-darwin-amd64.tar.gz'),
+      ]
+      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', assets))
+      mockInstallTool.mockResolvedValue(undefined)
+
+      await run()
+
+      expect(mockInstallTool).toHaveBeenCalledWith(
+        'tool',
+        '1.0.0',
+        expect.stringContaining('tool-linux-musl-amd64.tar.gz'),
+        true,
+      )
+    })
+
+    it('should use glibc asset when no musl variant available', async () => {
+      mockInputs({ repository: 'owner/tool' })
+      mockedTask.getVariable.mockReturnValue('token')
+      const assets = [makeAsset('tool-linux-amd64.tar.gz'), makeAsset('tool-darwin-amd64.tar.gz')]
+      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', assets))
+      mockInstallTool.mockResolvedValue(undefined)
+
+      await run()
+
+      expect(mockInstallTool).toHaveBeenCalledWith(
+        'tool',
+        '1.0.0',
+        expect.stringContaining('tool-linux-amd64.tar.gz'),
+        true,
+      )
+    })
+
+    it('should match x86 asset on Windows ia32 arch', async () => {
+      const winInstallTool = vi.fn().mockResolvedValue(undefined)
+      vi.resetModules()
+      vi.doMock('node:os', async (importOriginal) => {
+        const actual = await importOriginal<typeof import('node:os')>()
+        return { ...actual, platform: () => 'win32', arch: () => 'ia32' }
+      })
+      vi.doMock('@bonddim/utils', () => ({
+        installTool: winInstallTool,
+        isWindows: vi.fn().mockReturnValue(true),
+      }))
+      vi.doMock('@octokit/rest', () => ({
+        Octokit: class {
+          rest = mockOctokit.rest
+        },
+      }))
+
+      const { run: ia32Run } = await import('../src/run')
+
+      mockedTask.getInput.mockImplementation((name: string) => {
+        const inputs: Record<string, string> = { repository: 'owner/tool' }
+        return inputs[name]
+      })
+      mockedTask.getVariable.mockReturnValue('token')
+      const assets = [
+        makeAsset('tool-windows-x64.zip'),
+        makeAsset('tool-windows-x86.zip'),
+        makeAsset('tool-linux-amd64.tar.gz'),
+      ]
+      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', assets))
+
+      await ia32Run()
+
+      expect(winInstallTool).toHaveBeenCalledWith(
+        'tool',
+        '1.0.0',
+        expect.stringContaining('tool-windows-x86.zip'),
+        true,
       )
     })
 
@@ -347,8 +404,6 @@ describe('run', () => {
       })
       vi.doMock('@bonddim/utils', () => ({
         installTool: winInstallTool,
-        downloadChecksumFile: vi.fn(),
-        validateChecksum: vi.fn(),
         isWindows: vi.fn().mockReturnValue(true),
       }))
       vi.doMock('@octokit/rest', () => ({
@@ -378,66 +433,6 @@ describe('run', () => {
         '1.0.0',
         expect.stringContaining('tool-windows-amd64.zip'),
         true,
-        undefined,
-      )
-    })
-  })
-
-  describe('checksum validation', () => {
-    it('should auto-detect checksum file and pass validator', async () => {
-      mockInputs({ repository: 'owner/tool' })
-      mockedTask.getVariable.mockReturnValue('token')
-      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', ASSETS_WITH_CHECKSUMS))
-      mockInstallTool.mockResolvedValue(undefined)
-
-      await run()
-
-      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.0.0', expect.any(String), true, expect.any(Function))
-    })
-
-    it('should execute checksum validation when validator is invoked', async () => {
-      const checksums = new Map([['tool-linux-amd64.tar.gz', 'abc123']])
-      mockInputs({ repository: 'owner/tool' })
-      mockedTask.getVariable.mockReturnValue('token')
-      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', ASSETS_WITH_CHECKSUMS))
-      mockInstallTool.mockImplementation(async (_tool, _version, _url, _extract, validate) => {
-        if (validate) await validate('/tmp/downloaded-file')
-      })
-      mockDownloadChecksumFile.mockResolvedValue(checksums)
-      mockValidateChecksum.mockResolvedValue(undefined)
-
-      await run()
-
-      expect(mockDownloadChecksumFile).toHaveBeenCalledWith('https://github.com/releases/download/v1.0.0/checksums.txt')
-      expect(mockValidateChecksum).toHaveBeenCalledWith('/tmp/downloaded-file', 'abc123')
-    })
-
-    it('should skip checksum validation when no checksum file in assets', async () => {
-      mockInputs({ repository: 'owner/tool' })
-      mockedTask.getVariable.mockReturnValue('token')
-      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', LINUX_ASSETS))
-      mockInstallTool.mockResolvedValue(undefined)
-
-      await run()
-
-      expect(mockInstallTool).toHaveBeenCalledWith('tool', '1.0.0', expect.any(String), true, undefined)
-    })
-
-    it('should fail when checksum entry not found for the asset', async () => {
-      const checksums = new Map([['other-file.tar.gz', 'abc123']])
-      mockInputs({ repository: 'owner/tool' })
-      mockedTask.getVariable.mockReturnValue('token')
-      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', ASSETS_WITH_CHECKSUMS))
-      mockInstallTool.mockImplementation(async (_tool, _version, _url, _extract, validate) => {
-        if (validate) await validate('/tmp/downloaded-file')
-      })
-      mockDownloadChecksumFile.mockResolvedValue(checksums)
-
-      await run()
-
-      expect(mockedTask.setResult).toHaveBeenCalledWith(
-        task.TaskResult.Failed,
-        expect.stringContaining('Checksum entry not found'),
       )
     })
   })
@@ -452,6 +447,7 @@ describe('run', () => {
       expect(mockedTask.setResult).toHaveBeenCalledWith(
         task.TaskResult.Failed,
         expect.stringContaining('Invalid repository format'),
+        true,
       )
     })
 
@@ -462,7 +458,7 @@ describe('run', () => {
 
       await run()
 
-      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'API rate limit exceeded')
+      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'API rate limit exceeded', true)
     })
 
     it('should fail when installTool throws', async () => {
@@ -473,7 +469,7 @@ describe('run', () => {
 
       await run()
 
-      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'download failed')
+      expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Failed, 'download failed', true)
     })
   })
 })

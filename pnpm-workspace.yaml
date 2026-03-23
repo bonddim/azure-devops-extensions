@@ -2,5 +2,7 @@ packages:
   - 'packages/*'
   - 'extensions/*'
 
+cleanupUnusedCatalogs: true
 allowBuilds:
+  esbuild: true
   simple-git-hooks: true

@@ -2,6 +2,11 @@
   "name": "argo-cd-cli-extension",
   "version": "1.0.1",
   "private": true,
+  "scripts": {
+    "build": "node ../../tools/build-tasks.mjs",
+    "package": "exec tfx extension create --manifest-js vss-extension.js",
+    "publish": "exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN --no-wait-validation"
+  },
   "dependencies": {
     "@bonddim/utils": "workspace:*"
   }

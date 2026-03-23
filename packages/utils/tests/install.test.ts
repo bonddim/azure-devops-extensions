@@ -1,10 +1,12 @@
 import * as fs from 'node:fs'
 import * as os from 'node:os'
+import * as taskLib from 'azure-pipelines-task-lib/task'
 import * as toolLib from 'azure-pipelines-tool-lib/tool'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('node:fs')
 vi.mock('node:os')
+vi.mock('azure-pipelines-task-lib/task')
 vi.mock('azure-pipelines-tool-lib/tool', () => ({
   findLocalTool: vi.fn(),
   downloadTool: vi.fn(),
@@ -68,6 +70,7 @@ describe('installTool', () => {
       vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.zip')
       vi.mocked(toolLib.extractZip).mockResolvedValue('/tmp/extracted')
       vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(taskLib.find).mockReturnValue([])
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool.zip', true)
 
@@ -83,6 +86,7 @@ describe('installTool', () => {
       vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.7z')
       vi.mocked(toolLib.extract7z).mockResolvedValue('/tmp/extracted')
       vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(taskLib.find).mockReturnValue([])
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool.7z', true)
 
@@ -98,6 +102,7 @@ describe('installTool', () => {
       vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.tar.gz')
       vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
       vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(taskLib.find).mockReturnValue([])
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool.tar.gz', true)
 
@@ -113,6 +118,7 @@ describe('installTool', () => {
       vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.bin')
       vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
       vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(taskLib.find).mockReturnValue([])
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool.bin', true)
 
@@ -124,6 +130,7 @@ describe('installTool', () => {
       vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.ZIP')
       vi.mocked(toolLib.extractZip).mockResolvedValue('/tmp/extracted')
       vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(taskLib.find).mockReturnValue([])
 
       await installTool('mytool', '1.0.0', 'https://example.com/mytool.ZIP', true)
 
@@ -131,49 +138,77 @@ describe('installTool', () => {
     })
   })
 
-  describe('validate callback', () => {
-    it('calls validate after download and before caching', async () => {
-      const callOrder: string[] = []
+  describe('nested executable detection', () => {
+    it('caches the extract root when the executable is at the top level', async () => {
       vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
-      vi.mocked(toolLib.downloadTool).mockImplementation(async () => {
-        callOrder.push('download')
-        return '/tmp/mytool'
-      })
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.tar.gz')
+      vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
+      vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
       vi.mocked(os.platform).mockReturnValue('linux')
-      vi.mocked(fs.promises.chmod).mockResolvedValue(undefined)
-      vi.mocked(toolLib.cacheFile).mockImplementation(async () => {
-        callOrder.push('cache')
-        return '/cached/mytool'
-      })
+      vi.mocked(fs.statSync).mockReturnValue({ isFile: () => true } as fs.Stats)
+      vi.mocked(taskLib.find).mockReturnValue(['/tmp/extracted/mytool', '/tmp/extracted/README.md'])
 
-      const validate = vi.fn().mockImplementation(async () => {
-        callOrder.push('validate')
-      })
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool.tar.gz', true)
 
-      await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate)
-
-      expect(validate).toHaveBeenCalledWith('/tmp/mytool')
-      expect(callOrder).toEqual(['download', 'validate', 'cache'])
+      expect(toolLib.cacheDir).toHaveBeenCalledWith('/tmp/extracted', 'mytool', '1.0.0')
     })
 
-    it('does not call validate when tool is cached', async () => {
-      vi.mocked(toolLib.findLocalTool).mockReturnValue('/cached/mytool')
-      const validate = vi.fn()
-
-      await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate)
-
-      expect(validate).not.toHaveBeenCalled()
-    })
-
-    it('propagates validate callback errors', async () => {
+    it('descends into a single top-level subdirectory to find the executable', async () => {
       vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
-      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool')
-      const validate = vi.fn().mockRejectedValue(new Error('checksum mismatch'))
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.tar.gz')
+      vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
+      vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(os.platform).mockReturnValue('linux')
+      vi.mocked(taskLib.find).mockReturnValue([
+        '/tmp/extracted/mytool-1.0.0/mytool',
+        '/tmp/extracted/mytool-1.0.0/README.md',
+      ])
 
-      const error = await installTool('mytool', '1.0.0', 'https://example.com/mytool', false, validate).catch((e) => e)
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool.tar.gz', true)
 
-      expect(error.message).toBe('Failed to install tool mytool version 1.0.0 from https://example.com/mytool')
-      expect(error.cause.message).toBe('checksum mismatch')
+      expect(toolLib.cacheDir).toHaveBeenCalledWith('/tmp/extracted/mytool-1.0.0', 'mytool', '1.0.0')
+    })
+
+    it('finds the executable in a nested bin/ subdirectory', async () => {
+      vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.tar.gz')
+      vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
+      vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(os.platform).mockReturnValue('linux')
+      vi.mocked(taskLib.find).mockReturnValue([
+        '/tmp/extracted/mytool-1.0.0/bin/mytool',
+        '/tmp/extracted/mytool-1.0.0/lib/libfoo.so',
+      ])
+
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool.tar.gz', true)
+
+      expect(toolLib.cacheDir).toHaveBeenCalledWith('/tmp/extracted/mytool-1.0.0/bin', 'mytool', '1.0.0')
+    })
+
+    it('finds mytool.exe in a nested directory on Windows', async () => {
+      vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.zip')
+      vi.mocked(toolLib.extractZip).mockResolvedValue('/tmp/extracted')
+      vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(os.platform).mockReturnValue('win32')
+      vi.mocked(taskLib.find).mockReturnValue(['/tmp/extracted/mytool-1.0.0/mytool.exe'])
+
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool.zip', true)
+
+      expect(toolLib.cacheDir).toHaveBeenCalledWith('/tmp/extracted/mytool-1.0.0', 'mytool', '1.0.0')
+    })
+
+    it('falls back to the extract root when the executable is not found', async () => {
+      vi.mocked(toolLib.findLocalTool).mockReturnValue(undefined as unknown as string)
+      vi.mocked(toolLib.downloadTool).mockResolvedValue('/tmp/mytool.tar.gz')
+      vi.mocked(toolLib.extractTar).mockResolvedValue('/tmp/extracted')
+      vi.mocked(toolLib.cacheDir).mockResolvedValue('/cached/mytool')
+      vi.mocked(os.platform).mockReturnValue('linux')
+      vi.mocked(taskLib.find).mockReturnValue(['/tmp/extracted/othertool'])
+
+      await installTool('mytool', '1.0.0', 'https://example.com/mytool.tar.gz', true)
+
+      expect(toolLib.cacheDir).toHaveBeenCalledWith('/tmp/extracted', 'mytool', '1.0.0')
     })
   })
 

@@ -35,7 +35,7 @@ describe('getEndpointDetails', () => {
 
     expect(result).toBe('https://argocd.example.com/')
     expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_SERVER', 'argocd.example.com')
-    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_AUTH_TOKEN', 'token123', true)
+    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_AUTH_TOKEN', 'token123')
   })
 
   it('should include pathname in ARGOCD_SERVER when URL has a path', () => {
@@ -270,7 +270,7 @@ describe('run', () => {
     await run()
 
     expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_SERVER', 'argocd.example.com')
-    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_AUTH_TOKEN', 'token123', true)
+    expect(mockedTask.setVariable).toHaveBeenCalledWith('ARGOCD_AUTH_TOKEN', 'token123')
     expect(mockInstallTool).toHaveBeenCalledWith('argocd', '2.10.0', expect.stringContaining('v2.10.0'), false)
     expect(mockedTask.setResult).toHaveBeenCalledWith(task.TaskResult.Succeeded, '')
   })
