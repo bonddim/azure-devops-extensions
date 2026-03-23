@@ -97,7 +97,7 @@ function isArchiveFile(name: string): boolean {
 
 /** Simple glob match supporting * wildcard */
 function globMatch(pattern: string, name: string): boolean {
-  const regex = new RegExp(`^${pattern.replace(/\*/g, '.*').replace(/\?/g, '.')}$`, 'i')
+  const regex = new RegExp(`^${pattern.replaceAll('*', '.*').replaceAll('?', '.')}$`, 'i')
   return regex.test(name)
 }
 
