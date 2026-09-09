@@ -316,6 +316,29 @@ describe('run', () => {
       )
     })
 
+    it('should not select sbom files as the tool asset', async () => {
+      mockInputs({ repository: 'owner/tool' })
+      mockedTask.getVariable.mockReturnValue('token')
+      const assets = [makeAsset('tool_1.0.0_linux_amd64'), makeAsset('tool_1.0.0_linux_amd64.sbom.json')]
+      mockOctokit.rest.repos.getLatestRelease.mockResolvedValue(mockRelease('v1.0.0', assets))
+      mockInstallTool.mockResolvedValue(undefined)
+
+      await run()
+
+      expect(mockInstallTool).toHaveBeenCalledWith(
+        'tool',
+        '1.0.0',
+        expect.stringContaining('tool_1.0.0_linux_amd64'),
+        false,
+      )
+      expect(mockInstallTool).not.toHaveBeenCalledWith(
+        'tool',
+        '1.0.0',
+        expect.stringContaining('.sbom.json'),
+        expect.anything(),
+      )
+    })
+
     it('should prefer musl over glibc when both linux assets present', async () => {
       mockInputs({ repository: 'owner/tool' })
       mockedTask.getVariable.mockReturnValue('token')
