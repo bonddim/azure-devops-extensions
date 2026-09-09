@@ -95,6 +95,11 @@ function isArchiveFile(name: string): boolean {
   return ARCHIVE_EXTENSIONS.some((ext) => lower.endsWith(ext))
 }
 
+/** Check if a filename is a software bill of materials file */
+function isSbomFile(name: string): boolean {
+  return name.toLowerCase().endsWith('.sbom.json')
+}
+
 /** Simple glob match supporting * wildcard */
 function globMatch(pattern: string, name: string): boolean {
   const regex = new RegExp(`^${pattern.replaceAll('*', '.*').replaceAll('?', '.')}$`, 'i')
@@ -113,6 +118,8 @@ function matchAsset(assets: ReleaseAsset[], filePattern: string | undefined): Re
 
   // Match by platform AND arch keywords
   let matched = assets.filter((a) => {
+    if (isSbomFile(a.name)) return false
+
     const lower = a.name.toLowerCase()
     const hasPlatform = platformKeywords.some((k) => lower.includes(k))
     const hasArch = archKeywords.some((k) => lower.includes(k))
