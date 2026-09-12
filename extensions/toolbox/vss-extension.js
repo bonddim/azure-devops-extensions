@@ -12,6 +12,23 @@ function manifest() {
     description: 'Azure Pipelines Toolbox',
     tags: ['tools', 'installer'],
     version,
+    contributions: [
+      ...base.contributions,
+      {
+        id: 'argocd-service-endpoint',
+        type: 'ms.vss-endpoint.service-endpoint-type',
+        targets: ['ms.vss-endpoint.endpoint-types'],
+        properties: {
+          name: 'ArgoCDServerConnection',
+          displayName: 'Argo CD Server',
+          url: {
+            displayName: 'Argo CD Server URL',
+            helpText: 'URL for the Argo CD Server to connect to.',
+          },
+          authenticationSchemes: [{ type: 'ms.vss-endpoint.endpoint-auth-scheme-token' }],
+        },
+      },
+    ],
   }
 }
 console.log('Final manifest:\n', JSON.stringify(manifest(), null, 2))
