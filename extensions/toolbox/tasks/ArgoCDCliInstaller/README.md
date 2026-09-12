@@ -7,7 +7,7 @@ Install Argo CD CLI on Azure DevOps pipeline agents.
 - Supports Linux, macOS, and Windows agents.
 - Caches the binary using the Azure Pipelines tool cache, so subsequent runs with the same version skip the download.
 - Installs the latest [released](https://github.com/argoproj/argo-cd/releases) version by default.
-- Adds an **Argo CD Server (Toolbox)** service connection to securely store credentials.
+- Adds an **Argo CD Server** service connection to securely store credentials.
 - Sets **ARGOCD_SERVER** and **ARGOCD_AUTH_TOKEN** environment variables from the provided service connection.
 - Optionally sets the **ARGOCD_OPTS** variable for extra configuration.
 - Built-in fallback mechanism for binary download in server mode.
@@ -16,7 +16,7 @@ Install Argo CD CLI on Azure DevOps pipeline agents.
 
 | Name         | Type               | Required | Default  | Description                                                                               |
 | ------------ | ------------------ | -------- | -------- | ----------------------------------------------------------------------------------------- |
-| `connection` | Service Connection | No       |          | Argo CD Server (Toolbox) service connection                                               |
+| `connection` | Service Connection | No       |          | Argo CD Server service connection                                               |
 | `version`    | String             | No       | `latest` | CLI version to install (`latest`, `server`, or a specific version like `v3.3.0`)          |
 | `options`    | String             | No       |          | Extra arguments for the `ARGOCD_OPTS` environment variable (e.g. `--grpc-web --insecure`) |
 
@@ -103,7 +103,7 @@ which is removed after 2027-01-31.
 # After
 - task: ArgoCDCliInstaller@0
   inputs:
-    connection: argocd-prod-toolbox
+    connection: argocd-prod
     version: server
 ```
 

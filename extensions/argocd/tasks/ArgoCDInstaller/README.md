@@ -1,11 +1,5 @@
 # Argo CD CLI Installer
 
-> [!WARNING]
-> **Deprecated — will be removed after 2027-01-31.**
-> Use **`ArgoCDCliInstaller@0`** from the
-> [Toolbox extension](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/toolbox/tasks/ArgoCDCliInstaller/README.md) instead.
-> See [Migration](#migration) below.
-
 Install Argo CD CLI on Azure DevOps pipeline agents.
 
 ## Features
@@ -92,31 +86,3 @@ The task sets the following environment variables when a service connection is p
 The task uses the Azure Pipelines [tool cache](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/caching)
 to store downloaded binaries. On subsequent runs with the same version, the cached binary is reused and the download
 step is skipped entirely.
-
-## Migration
-
-Replace the task name and recreate the service connection. Inputs are unchanged.
-
-```yaml
-# Before
-- task: ArgoCDInstaller@0
-  inputs:
-    connection: argocd-prod
-    version: server
-    options: --grpc-web
-
-# After
-- task: ArgoCDCliInstaller@0
-  inputs:
-    connection: argocd-prod-toolbox
-    version: server
-    options: --grpc-web
-```
-
-**One manual step:** the Toolbox task uses its own service connection type, because Azure DevOps
-endpoint type names are global to a collection and cannot be shared between two installed extensions.
-Create a new **Argo CD Server (Toolbox)** service connection from the Toolbox extension and point the
-`connection` input at it. The URL and API token are the same as before.
-
-Everything else — `latest`/`server`/explicit version resolution, the server download fallback, and the
-`ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and `ARGOCD_OPTS` variables — behaves identically.

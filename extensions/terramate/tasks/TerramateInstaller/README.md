@@ -1,12 +1,5 @@
 # Terramate CLI Installer
 
-> [!WARNING]
-> **Deprecated — will be removed after 2027-01-31.**
-> Use **`GitHubToolInstaller@0`** from the
-> [Toolbox extension](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/toolbox/tasks/GitHubToolInstaller/README.md) instead.
-> It requires a GitHub service connection or a `GITHUB_TOKEN` variable, which `TerramateInstaller` did not.
-> See [Migration](#migration) below.
-
 Install [Terramate CLI](https://terramate.io/) on Azure DevOps pipeline agents.
 
 - Supports Linux, macOS, and Windows agents.
@@ -44,45 +37,5 @@ steps:
     inputs:
       version: v0.16.0 # or 0.16.0
 ```
-
-## Migration
-
-```yaml
-# Before
-- task: TerramateInstaller@0
-  inputs:
-    version: latest
-
-# After
-- task: GitHubToolInstaller@0
-  inputs:
-    connection: my-github-connection
-    repository: terramate-io/terramate
-    version: latest
-```
-
-**`GitHubToolInstaller` requires GitHub authentication; `TerramateInstaller` did not.** Provide either
-a GitHub service connection via the `connection` input, or a `GITHUB_TOKEN` variable:
-
-```yaml
-- task: GitHubToolInstaller@0
-  inputs:
-    repository: terramate-io/terramate
-  env:
-    GITHUB_TOKEN: $(GITHUB_TOKEN)
-```
-
-Pinned versions work the same way, with or without the `v` prefix:
-
-```yaml
-- task: GitHubToolInstaller@0
-  inputs:
-    connection: my-github-connection
-    repository: terramate-io/terramate
-    version: v0.16.0
-```
-
-No `filePattern` is needed — Terramate's release assets are matched unambiguously on Linux (x64, arm64),
-Windows (x64), and macOS (arm64) agents.
 
 > **Note:** This is not an official Terramate extension.

@@ -10,7 +10,7 @@ function manifest() {
     public: true,
     name: 'Toolbox',
     description: 'Azure Pipelines Toolbox',
-    tags: ['tools', 'installer'],
+    tags: ['argocd', 'cli', 'github', 'installer', 'tools'],
     version,
     contributions: [
       ...base.contributions,
@@ -20,7 +20,7 @@ function manifest() {
         targets: ['ms.vss-endpoint.endpoint-types'],
         properties: {
           name: 'ArgoCDServerConnection',
-          displayName: 'Argo CD Server (Toolbox)',
+          displayName: 'Argo CD Server',
           url: {
             displayName: 'Argo CD Server URL',
             helpText: 'URL for the Argo CD Server to connect to.',
