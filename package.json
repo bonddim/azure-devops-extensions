@@ -29,7 +29,7 @@
     "esbuild": "^0.28.1",
     "glob": "^13.0.6",
     "simple-git-hooks": "^2.13.1",
-    "tfx-cli": "^0.23.1",
+    "tfx-cli": "^0.24.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",
     "vitest-sonar-reporter": "^3.0.0"
