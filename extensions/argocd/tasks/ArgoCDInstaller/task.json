@@ -10,9 +10,12 @@
   "author": "Dmytro Bondar",
   "version": {
     "Major": 0,
-    "Minor": 2,
+    "Minor": 3,
     "Patch": 0
   },
+  "deprecated": true,
+  "deprecationMessage": "ArgoCDInstaller is deprecated and will be removed after 2027-01-31. Use ArgoCDCliInstaller@0 from the Toolbox extension. You must recreate your Argo CD service connection under the Toolbox endpoint type.",
+  "removalDate": "2027-01-31",
   "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Install Argo CD CLI",
   "inputs": [
