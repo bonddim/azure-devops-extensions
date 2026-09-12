@@ -4,8 +4,8 @@
   "name": "ArgoCDInstaller",
   "friendlyName": "Argo CD CLI Installer",
   "description": "Install Argo CD CLI on pipeline agents",
-  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md",
-  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md)",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/tasks/ArgoCDInstaller/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/tasks/ArgoCDInstaller/README.md)",
   "category": "Azure Pipelines",
   "author": "Dmytro Bondar",
   "version": {

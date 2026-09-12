@@ -20,7 +20,7 @@ function manifest() {
         targets: ['ms.vss-endpoint.endpoint-types'],
         properties: {
           name: 'ArgoCDServerConnection',
-          displayName: 'Argo CD Server',
+          displayName: 'Argo CD Server (Toolbox)',
           url: {
             displayName: 'Argo CD Server URL',
             helpText: 'URL for the Argo CD Server to connect to.',

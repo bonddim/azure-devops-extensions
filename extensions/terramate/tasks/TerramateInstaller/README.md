@@ -4,6 +4,7 @@
 > **Deprecated — will be removed after 2027-01-31.**
 > Use **`GitHubToolInstaller@0`** from the
 > [Toolbox extension](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/toolbox/tasks/GitHubToolInstaller/README.md) instead.
+> It requires a GitHub service connection or a `GITHUB_TOKEN` variable, which `TerramateInstaller` did not.
 > See [Migration](#migration) below.
 
 Install [Terramate CLI](https://terramate.io/) on Azure DevOps pipeline agents.
@@ -81,7 +82,7 @@ Pinned versions work the same way, with or without the `v` prefix:
     version: v0.16.0
 ```
 
-No `filePattern` is needed — Terramate's release assets are matched unambiguously on Linux, macOS,
-and Windows agents for both x64 and arm64.
+No `filePattern` is needed — Terramate's release assets are matched unambiguously on Linux (x64, arm64),
+Windows (x64), and macOS (arm64) agents.
 
 > **Note:** This is not an official Terramate extension.

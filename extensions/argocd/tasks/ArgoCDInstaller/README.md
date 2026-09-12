@@ -115,7 +115,7 @@ Replace the task name and recreate the service connection. Inputs are unchanged.
 
 **One manual step:** the Toolbox task uses its own service connection type, because Azure DevOps
 endpoint type names are global to a collection and cannot be shared between two installed extensions.
-Create a new **Argo CD Server** service connection from the Toolbox extension and point the
+Create a new **Argo CD Server (Toolbox)** service connection from the Toolbox extension and point the
 `connection` input at it. The URL and API token are the same as before.
 
 Everything else — `latest`/`server`/explicit version resolution, the server download fallback, and the

@@ -4,8 +4,8 @@
   "name": "TerramateInstaller",
   "friendlyName": "Terramate CLI Installer",
   "description": "Install Terramate CLI",
-  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md",
-  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md)",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/tasks/TerramateInstaller/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/tasks/TerramateInstaller/README.md)",
   "category": "Azure Pipelines",
   "author": "Dmytro Bondar",
   "version": {

@@ -10,7 +10,7 @@ Each extension is designed to solve specific problems and improve the efficiency
 
 ## Extensions
 
-- [Toolbox](https://marketplace.visualstudio.com/items?itemName=bonddim.toolbox) - Install any tool from GitHub releases, plus the Argo CD CLI.
+- [Toolbox](https://marketplace.visualstudio.com/items?itemName=bonddim.853934ee-2696-11f1-b8e6-00155d89217a) - Install any tool from GitHub releases, plus the Argo CD CLI.
 - [Argo CD CLI Extension](https://marketplace.visualstudio.com/items/bonddim.argocd-installer) - **Deprecated**, removed after 2027-01-31. Use `ArgoCDCliInstaller@0` from Toolbox.
 - [Terramate](https://marketplace.visualstudio.com/items?itemName=bonddim.terramate-devops-extension) - **Deprecated**, removed after 2027-01-31. Use `GitHubToolInstaller@0` from Toolbox.
 
