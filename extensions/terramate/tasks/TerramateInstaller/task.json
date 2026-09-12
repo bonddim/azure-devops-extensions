@@ -4,15 +4,18 @@
   "name": "TerramateInstaller",
   "friendlyName": "Terramate CLI Installer",
   "description": "Install Terramate CLI",
-  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md",
-  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md)",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/tasks/TerramateInstaller/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/tasks/TerramateInstaller/README.md)",
   "category": "Azure Pipelines",
   "author": "Dmytro Bondar",
   "version": {
     "Major": 0,
-    "Minor": 2,
+    "Minor": 3,
     "Patch": 0
   },
+  "deprecated": true,
+  "deprecationMessage": "TerramateInstaller is deprecated and will be removed after 2027-01-31. Follow the migration guide https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md#migration",
+  "removalDate": "2027-01-31",
   "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Install Terramate CLI",
   "inputs": [
