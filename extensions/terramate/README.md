@@ -1,38 +1,11 @@
-# Terramate Azure DevOps Extension
+# Terramate Extension
 
-Install the extension from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=bonddim.terramate-devops-extension).
+Terramate extension for Azure DevOps Pipelines.
 
-## TerramateInstaller Task
+Install from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=bonddim.terramate-devops-extension).
 
-- Installs the [Terramate CLI](https://terramate.io/) on an Azure DevOps agent.
-- Supports Linux, macOS, and Windows agents.
-- Adds Terramate CLI to the system PATH for use in subsequent pipeline steps.
-- Allows installation of a specific version or installs the latest release by default.
-- Caches the downloaded binary to speed up subsequent pipeline runs.
+## Tasks
 
-### Usage
-
-- Install the latest released version:
-
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-    ```
-
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-        inputs:
-          version: latest
-    ```
-
-- Install a specific version:
-
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-        inputs:
-          version: v0.16.0 # or 0.16.0
-    ```
+- [TerramateInstaller](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/tasks/TerramateInstaller/README.md) - Install Terramate CLI on pipeline agents
 
 > **Note:** This is not an official Terramate extension.
