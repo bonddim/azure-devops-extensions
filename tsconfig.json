@@ -9,6 +9,9 @@
       "path": "extensions/argocd/tasks/ArgoCDInstaller"
     },
     {
+      "path": "extensions/toolbox/tasks/ArgoCDCliInstaller"
+    },
+    {
       "path": "extensions/terramate/tasks/TerramateInstaller"
     },
     {
