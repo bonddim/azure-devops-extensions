@@ -126,7 +126,7 @@ For `TerramateInstaller`:
 ```jsonc
 "deprecated": true,
 "deprecationMessage": "TerramateInstaller is deprecated. Use GitHubToolInstaller@0 from the Toolbox extension with repository 'terramate-io/terramate'. It requires a GitHub service connection or a GITHUB_TOKEN variable.",
-"removalDate": "2027-03-31"
+"removalDate": "2027-01-31"
 ```
 
 For `ArgoCDInstaller`:
@@ -134,11 +134,11 @@ For `ArgoCDInstaller`:
 ```jsonc
 "deprecated": true,
 "deprecationMessage": "ArgoCDInstaller is deprecated. Use ArgoCDCliInstaller@0 from the Toolbox extension. You must recreate your Argo CD service connection under the Toolbox endpoint type.",
-"removalDate": "2027-03-31"
+"removalDate": "2027-01-31"
 ```
 
 Bump each task's minor version so the deprecation metadata actually ships. The removal date is
-roughly six months out and appears verbatim in the agent's warning.
+roughly four and a half months out and appears verbatim in the agent's warning.
 
 No `taskLib.warning()` call is added. The platform already warns on a deprecated task with a removal
 date; a second warning in the build log is noise.
@@ -211,7 +211,7 @@ CI publishes all three. Nothing is unpublished.
 
 ## Follow-up work (not in this change)
 
-Tracked as a separate issue, to be done after `2027-03-31`:
+Tracked as a separate issue, to be done after `2027-01-31`:
 
 - Delete `extensions/terramate/` and `extensions/argocd/`.
 - Remove their root `tsconfig.json` references.
