@@ -1,39 +1,95 @@
-# Argo CD CLI Extension
+## Features
 
-> ⚠️ **Deprecated - will be removed after 2027-01-31.**
-> The Argo CD CLI installer has moved to the
-> [Toolbox extension](https://marketplace.visualstudio.com/items?itemName=bonddim.853934ee-2696-11f1-b8e6-00155d89217a) as
-> **`ArgoCDCliInstaller@0`**. See [Migration](#migration) below.
+- Supports Linux, macOS, and Windows agents.
+- Caches the binary using the Azure Pipelines tool cache, so subsequent runs with the same version skip the download.
+- Installs the latest [released](https://github.com/argoproj/argo-cd/releases) version by default.
+- Adds **Argo CD Server** service connection to securely store credentials.
+- Sets **ARGOCD_SERVER** and **ARGOCD_AUTH_TOKEN** environment variables from the provided service connection.
+- Optionally sets the **ARGOCD_OPTS** variable for extra configuration.
+- Built-in fallback mechanism for binary download in server mode.
 
-Argo CD CLI Extension for Azure DevOps Pipelines.
+## Installation
 
-Install from the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items/bonddim.argocd-installer).
+Install the extension from the
+[Azure DevOps Marketplace](https://marketplace.visualstudio.com/items/bonddim.argocd-installer).
 
-## Tasks
+## Usage
 
-- [ArgoCDInstaller](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/tasks/ArgoCDInstaller/README.md) - Install Argo CD CLI on pipeline agents
+### Inputs
 
-## Migration
+| Name         | Type               | Required | Default  | Description                                                                               |
+| ------------ | ------------------ | -------- | -------- | ----------------------------------------------------------------------------------------- |
+| `connection` | Service Connection | No       |          | Argo CD Server service connection                                                         |
+| `version`    | String             | No       | `latest` | CLI version to install (`latest`, `server`, or a specific version like `v3.3.0`)          |
+| `options`    | String             | No       |          | Extra arguments for the `ARGOCD_OPTS` environment variable (e.g. `--grpc-web --insecure`) |
 
-- Uninstall the "Argo CD CLI Extension" from your Azure DevOps organization.
-- Install the [Toolbox extension](https://marketplace.visualstudio.com/items?itemName=bonddim.853934ee-2696-11f1-b8e6-00155d89217a) from the Azure DevOps Marketplace.
-- Create a new **Argo CD Server** service connection (could be the same as the one used previously).
-- Replace the task name in your pipelines. Inputs are unchanged.
+
+### Install latest version
+
+Use this configuration to install the latest released version:
 
 ```yaml
-# Before
+- task: ArgoCDInstaller@0
+```
+
+```yaml
 - task: ArgoCDInstaller@0
   inputs:
-    connection: argocd-prod
-    version: server
-    options: --grpc-web
+    version: latest
+```
 
-# After
-- task: ArgoCDCliInstaller@0
+### Install specific version
+
+To install a specific version of Argo CD CLI, specify the desired version:
+
+```yaml
+- task: ArgoCDInstaller@0
   inputs:
-    connection: argocd-prod
+    version: v3.3.0
+```
+
+### Install server version
+
+This option installs the version matching your Argo CD server. Requires a service connection.
+
+```yaml
+- task: ArgoCDInstaller@0
+  inputs:
+    connection: ServiceConnectionName or ServiceConnectionID
     version: server
     options: --grpc-web
 ```
-Everything else - `latest`/`server`/explicit version resolution, the server download fallback, and the
-`ARGOCD_SERVER`, `ARGOCD_AUTH_TOKEN`, and `ARGOCD_OPTS` variables - behaves identically.
+
+## Version Resolution
+
+The task resolves the CLI version based on the `version` input:
+
+* `latest` - Fetches the latest release tag from the [GitHub releases](https://github.com/argoproj/argo-cd/releases) page. If resolution fails, the task fails immediately.
+* `server` - Queries the Argo CD server API (`/api/version`) to determine the running version. Requires a service connection. If the server is unreachable or returns an invalid response, the task fails immediately.
+* Explicit version (e.g. `v3.3.0`) - Used as-is without any remote lookup.
+
+## Fallback Behavior
+
+### Download fallback (server mode only)
+
+When version is set to `server`, the task first attempts to download the binary directly from the Argo CD server
+(`{serverUrl}/download/argocd-{platform}-{arch}`).
+If the server returns a non-2xx HTTP response, it falls back to the GitHub releases download using the resolved server version and logs a warning.
+Any other error (network failure, disk error, etc.) fails the task immediately without a fallback.
+
+
+## Environment Variables
+
+The task sets the following environment variables when a service connection is provided:
+
+| Variable            | Description                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `ARGOCD_SERVER`     | Server hostname and path extracted from the service connection URL (without protocol). |
+| `ARGOCD_AUTH_TOKEN` | API token from the service connection credentials.                                     |
+| `ARGOCD_OPTS`       | Set only when the `options` input is provided. Contains extra CLI flags.               |
+
+## Caching
+
+The task uses the Azure Pipelines [tool cache](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/caching)
+to store downloaded binaries. On subsequent runs with the same version, the cached binary is reused and the download
+step is skipped entirely.
