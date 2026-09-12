@@ -4,18 +4,15 @@
   "name": "ArgoCDInstaller",
   "friendlyName": "Argo CD CLI Installer",
   "description": "Install Argo CD CLI on pipeline agents",
-  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/tasks/ArgoCDInstaller/README.md",
-  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/tasks/ArgoCDInstaller/README.md)",
+  "helpUrl": "https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md",
+  "helpMarkDown": "[Learn more about this task](https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md)",
   "category": "Azure Pipelines",
   "author": "Dmytro Bondar",
   "version": {
     "Major": 0,
-    "Minor": 3,
+    "Minor": 2,
     "Patch": 0
   },
-  "deprecated": true,
-  "deprecationMessage": "ArgoCDInstaller is deprecated and will be removed after 2027-01-31. Follow the migration guide https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/argocd/README.md#migration.",
-  "removalDate": "2027-01-31",
   "minimumAgentVersion": "3.232.1",
   "instanceNameFormat": "Install Argo CD CLI",
   "inputs": [
