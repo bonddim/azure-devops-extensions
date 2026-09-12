@@ -9,6 +9,9 @@
       "path": "extensions/argocd/tasks/ArgoCDInstaller"
     },
     {
+      "path": "extensions/terramate/tasks/TerramateInstaller"
+    },
+    {
       "path": "extensions/toolbox/tasks/GitHubToolInstaller"
     }
   ]
