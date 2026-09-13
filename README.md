@@ -11,6 +11,7 @@ Each extension is designed to solve specific problems and improve the efficiency
 ## Extensions
 
 - [Argo CD CLI Extension](https://marketplace.visualstudio.com/items/bonddim.argocd-installer) - Install Argo CD CLI on pipeline agents.
+- [Toolbox](https://marketplace.visualstudio.com/items?itemName=bonddim.853934ee-2696-11f1-b8e6-00155d89217a) - Install any tool from GitHub releases.
 
 ## Contributing
 
