@@ -68,14 +68,15 @@ async function resolveRelease(octokit: Octokit, owner: string, repo: string, ver
     const stableReleases = allReleases.filter((r) => !r.draft && !r.prerelease)
     const cleanTags = stableReleases.map((r) => semver.clean(r.tag_name) || r.tag_name)
     const matched = semver.maxSatisfying(cleanTags, version)
+    const release = matched ? stableReleases.find((_, i) => cleanTags[i] === matched) : undefined
 
-    if (!matched) {
+    if (!release) {
       throw new Error(
         `No release found matching version range '${version}'. Available versions: ${cleanTags.join(', ')}`,
       )
     }
 
-    return stableReleases.find((r) => (semver.clean(r.tag_name) || r.tag_name) === matched)!
+    return release
   }
 
   // Exact version - try as-is first, then with 'v' prefix
@@ -151,19 +152,21 @@ function matchAsset(assets: ReleaseAsset[], filePattern: string | undefined): Re
     if (archives.length > 0) matched = archives
   }
 
-  if (matched.length === 0) {
+  const [asset, ...rest] = matched
+
+  if (!asset) {
     const available = assets.map((a) => a.name).join(', ')
     throw new Error(
       `No matching asset found for platform '${platform}' and architecture '${arch}'. Available assets: ${available}`,
     )
   }
 
-  if (matched.length > 1) {
+  if (rest.length > 0) {
     const names = matched.map((a) => a.name).join(', ')
     throw new Error(`Multiple matching assets found: ${names}. Use the filePattern input to narrow down the selection.`)
   }
 
-  return matched[0]!
+  return asset
 }
 
 /**
