@@ -30,7 +30,7 @@
     "glob": "^13.0.6",
     "simple-git-hooks": "^2.14.0",
     "tfx-cli": "^0.24.1",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vitest": "^5.0.0",
     "vitest-sonar-reporter": "^3.0.0"
   }
