@@ -1,5 +1,17 @@
 {
   "name": "azure-devops-extensions",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^12.4.1",
+      "onFail": "download"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "^24.13.0",
+      "onFail": "warn"
+    }
+  },
   "scripts": {
     "prepare": "git fetch origin main",
     "changeset": "changeset",
