@@ -1,5 +1,15 @@
 # Terramate Extension Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- 2e63395: deprecated: TerramateInstaller is deprecated and will be removed after 2027-01-31. Follow the migration guide https://github.com/bonddim/azure-devops-extensions/blob/main/extensions/terramate/README.md#migration.
+
+### Patch Changes
+
+- 93113f4: chore: update dependencies
+
 ## 1.0.2
 
 ### Patch Changes
