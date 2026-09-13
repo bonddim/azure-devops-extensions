@@ -46,11 +46,11 @@ jobs:
           echo "::add-mask::$token"
           echo "token=$token" >> $GITHUB_OUTPUT
 
-      - name: Create Release Pull Request
+      - name: Run changesets
         id: changesets
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          publish-script: pnpm run publish
+          publish-script: pnpm run release
           pr-title: "Release extensions"
           commit-message: "Release extensions"
         env:

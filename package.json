@@ -20,7 +20,8 @@
     "prebuild": "pnpm --filter ./packages/* --if-present run build",
     "build": "pnpm  --filter ...[${PNPM_BASE:-origin/main}] --if-present run build",
     "package": "pnpm --filter ...[${PNPM_BASE:-origin/main}] --if-present run package",
-    "publish": "pnpm --filter ...[${PNPM_BASE:-origin/main}] --if-present run publish"
+    "publish": "pnpm --filter ...[${PNPM_BASE:-origin/main}] --if-present run publish",
+    "release": "pnpm run publish && changeset git-tag"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm biome check --fix"
