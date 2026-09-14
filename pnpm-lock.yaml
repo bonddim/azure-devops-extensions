@@ -183,40 +183,40 @@ importers:
         version: 2.8.1
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.5.13
+        specifier: 2.5.13
         version: 2.5.13
       '@changesets/cli':
-        specifier: ^3.0.2
+        specifier: 3.0.2
         version: 3.0.2
       '@types/node':
-        specifier: ^24.13.4
+        specifier: 24.13.4
         version: 24.13.4
       '@types/semver':
-        specifier: ^7.8.0
+        specifier: 7.8.0
         version: 7.8.0
       '@vitest/coverage-v8':
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0(vitest@5.0.0)
       esbuild:
-        specifier: ^0.28.2
+        specifier: 0.28.2
         version: 0.28.2
       glob:
-        specifier: ^13.0.6
+        specifier: 13.0.6
         version: 13.0.6
       simple-git-hooks:
-        specifier: ^2.14.0
+        specifier: 2.14.0
         version: 2.14.0
       tfx-cli:
-        specifier: ^0.24.1
+        specifier: 0.24.1
         version: 0.24.1
       typescript:
-        specifier: ^7.0.2
+        specifier: 7.0.2
         version: 7.0.2
       vitest:
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0(@types/node@24.13.4)(@vitest/coverage-v8@5.0.0)(vite@7.3.1(@types/node@24.13.4)(tsx@4.21.0)(yaml@2.9.1))
       vitest-sonar-reporter:
-        specifier: ^3.0.0
+        specifier: 3.0.0
         version: 3.0.0(vitest@5.0.0)
 
   extensions/argocd:
