@@ -1,5 +1,13 @@
 # Toolbox Changelog
 
+## 0.1.4
+
+### Patch Changes
+
+- 6a87f37: chore(deps): update dependency azure-pipelines-task-lib to v5.280.3
+- 892b319: chore(deps): update dependency azure-pipelines-tool-lib to v2.281.0
+- 13cf7ee: chore(deps): lock file maintenance
+
 ## 0.1.3
 
 ### Patch Changes
