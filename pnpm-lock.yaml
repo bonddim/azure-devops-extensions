@@ -171,7 +171,7 @@ importers:
         version: 22.0.1
       azure-pipelines-task-lib:
         specifier: ^5.279.0
-        version: 5.279.0(debug@4.4.3)
+        version: 5.280.3(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: ^2.280.0
         version: 2.280.0(debug@4.4.3)
@@ -934,10 +934,6 @@ packages:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
 
-  adm-zip@0.6.1:
-    resolution: {integrity: sha512-Xwrja8nx9e5o2N1my4DsKCeKpdrnACyr1wtbPxBDgGzKzKyE9kRtBFA8mWldI+RVlD7CBZNWY/wQ2+ydwOR6kQ==}
-    engines: {node: '>=14.0'}
-
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -1009,8 +1005,8 @@ packages:
     resolution: {integrity: sha512-ilMGKj00R8DWR4xMUZ2XwFMhNW3eVc339loDXzoHegf4qGHMR50MC1NKtHQU2yC0SwgBQaqpJgnOw/Uz8AViig==}
     engines: {node: '>= 16.0.0'}
 
-  azure-pipelines-task-lib@5.279.0:
-    resolution: {integrity: sha512-abej/e5UxEr23vGH6cDlWsCq7fGS6Zna95JEey5bSsyYQZZyqieDIoVrBNe1tCTwCSzFEW+F7FcVUAqGpM/wvg==}
+  azure-pipelines-task-lib@5.280.3:
+    resolution: {integrity: sha512-fvxvAZxnzVlkE5aRWmYZSkbbNlC7gYYpcg1AWtkEs+8lZnZkWn5P2iZaHuCaHMs6iIT5/axBdz2Ms2q97Puuew==}
 
   azure-pipelines-tool-lib@2.280.0:
     resolution: {integrity: sha512-CKz33RADlCvnAidkIFpxpNFQi6JWqjrtnRtlK+qyoB+R8mM9khtzdppsZEc4YmJdzmgS6Defm1IAM5psFN0MVQ==}
@@ -2941,8 +2937,6 @@ snapshots:
     dependencies:
       event-target-shim: 5.0.1
 
-  adm-zip@0.6.1: {}
-
   agent-base@6.0.2:
     dependencies:
       debug: 4.4.3
@@ -3038,9 +3032,8 @@ snapshots:
       tunnel: 0.0.6
       typed-rest-client: 3.1.2
 
-  azure-pipelines-task-lib@5.279.0(debug@4.4.3):
+  azure-pipelines-task-lib@5.280.3(debug@4.4.3):
     dependencies:
-      adm-zip: 0.6.1
       minimatch: 3.1.5
       nodejs-file-downloader: 4.13.0(debug@4.4.3)
       q: 1.5.1
@@ -3054,7 +3047,7 @@ snapshots:
     dependencies:
       '@types/semver': 5.5.0
       '@types/uuid': 3.4.13
-      azure-pipelines-task-lib: 5.279.0(debug@4.4.3)
+      azure-pipelines-task-lib: 5.280.3(debug@4.4.3)
       semver: 5.7.2
       semver-compare: 1.0.0
       typed-rest-client: 3.1.2
