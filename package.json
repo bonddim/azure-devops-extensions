@@ -34,13 +34,13 @@
     "@changesets/cli": "3.0.3",
     "@types/node": "24.13.4",
     "@types/semver": "7.8.0",
-    "@vitest/coverage-v8": "5.0.0",
+    "@vitest/coverage-v8": "5.0.1",
     "esbuild": "0.28.2",
     "glob": "13.0.6",
     "simple-git-hooks": "2.14.0",
     "tfx-cli": "0.24.2",
     "typescript": "7.0.2",
-    "vitest": "5.0.0",
+    "vitest": "5.0.1",
     "vitest-sonar-reporter": "3.0.0"
   }
 }
