@@ -171,7 +171,7 @@ importers:
         version: 22.0.1
       azure-pipelines-task-lib:
         specifier: ^5.279.0
-        version: 5.280.3(debug@4.4.3)
+        version: 5.281.2(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: ^2.280.0
         version: 2.281.0(debug@4.4.3)
@@ -1002,8 +1002,8 @@ packages:
     resolution: {integrity: sha512-ilMGKj00R8DWR4xMUZ2XwFMhNW3eVc339loDXzoHegf4qGHMR50MC1NKtHQU2yC0SwgBQaqpJgnOw/Uz8AViig==}
     engines: {node: '>= 16.0.0'}
 
-  azure-pipelines-task-lib@5.280.3:
-    resolution: {integrity: sha512-fvxvAZxnzVlkE5aRWmYZSkbbNlC7gYYpcg1AWtkEs+8lZnZkWn5P2iZaHuCaHMs6iIT5/axBdz2Ms2q97Puuew==}
+  azure-pipelines-task-lib@5.281.2:
+    resolution: {integrity: sha512-0FMf/aJT1pDvfBjrruEqRQCaSiecvLnt+NBRm2TXk1MkrOPbCIMKLkOpKsFpBuBDsnC/q1xD3F8jOkEMsgV9dw==}
 
   azure-pipelines-tool-lib@2.281.0:
     resolution: {integrity: sha512-aTrAQKbY59Ieg1dfxHZWeSlJ8LJMAJj3k3kaVWvMv+qsIUWZxA+XBh17J+oYe2JVXlVdL9l2PHMK9KINaH2VPQ==}
@@ -3016,7 +3016,7 @@ snapshots:
       tunnel: 0.0.6
       typed-rest-client: 3.1.2
 
-  azure-pipelines-task-lib@5.280.3(debug@4.4.3):
+  azure-pipelines-task-lib@5.281.2(debug@4.4.3):
     dependencies:
       minimatch: 3.1.5
       nodejs-file-downloader: 4.13.0(debug@4.4.3)
@@ -3030,7 +3030,7 @@ snapshots:
   azure-pipelines-tool-lib@2.281.0(debug@4.4.3):
     dependencies:
       '@types/semver': 5.5.0
-      azure-pipelines-task-lib: 5.280.3(debug@4.4.3)
+      azure-pipelines-task-lib: 5.281.2(debug@4.4.3)
       semver: 5.7.2
       semver-compare: 1.0.0
       typed-rest-client: 3.1.2
