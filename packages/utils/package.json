@@ -15,5 +15,10 @@
   },
   "scripts": {
     "build": "tsc --build"
+  },
+  "dependencies": {
+    "azure-pipelines-task-lib": "catalog:",
+    "azure-pipelines-tool-lib": "catalog:",
+    "tslib": "catalog:"
   }
 }

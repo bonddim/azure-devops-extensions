@@ -4,9 +4,11 @@ const { dirname, basename, join } = require('node:path')
 
 const repository = 'https://github.com/bonddim/azure-devops-extensions'
 
-// Pre-read and merge lib.json from both libraries once, since they are the same for all tasks
-const taskLib = JSON.parse(readFileSync(require.resolve('azure-pipelines-task-lib/lib.json'), 'utf-8'))
-const toolLib = JSON.parse(readFileSync(require.resolve('azure-pipelines-tool-lib/lib.json'), 'utf-8'))
+// Pre-read and merge lib.json once; resolved from the extension dir (cwd), where the libs are dependencies
+const readLib = (name) =>
+  JSON.parse(readFileSync(require.resolve(`${name}/lib.json`, { paths: [process.cwd()] }), 'utf-8'))
+const taskLib = readLib('azure-pipelines-task-lib')
+const toolLib = readLib('azure-pipelines-tool-lib')
 const mergedLib = JSON.stringify({ messages: { ...taskLib.messages, ...toolLib.messages } }, null, 2)
 /**
  * Merges lib.json from azure-pipelines-task-lib and azure-pipelines-tool-lib into each task's dist/ directory.
