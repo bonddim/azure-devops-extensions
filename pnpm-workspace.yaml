@@ -13,3 +13,5 @@ cleanupUnusedCatalogs: true
 allowBuilds:
   esbuild: true
   simple-git-hooks: true
+updateConfig:
+  changeset: true
