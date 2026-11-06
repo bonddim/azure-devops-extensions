@@ -1,5 +1,14 @@
 # Toolbox Changelog
 
+## 0.1.5
+
+### Patch Changes
+
+- beb331b: chore(deps): update dependency azure-pipelines-task-lib to v5.282.0
+- d33e995: chore(deps): update dependency semver to v7.8.6
+- 5e43636: refactor: simplify GitHubToolInstaller asset matching
+- 5e43636: fix: mark task entry point promise as explicitly ignored
+
 ## 0.1.4
 
 ### Patch Changes
