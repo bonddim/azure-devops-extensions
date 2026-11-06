@@ -107,6 +107,13 @@ function globMatch(pattern: string, name: string): boolean {
   return regex.test(name)
 }
 
+/** Narrow multiple assets to those matching the predicate, keeping the input if none match */
+function narrow(assets: ReleaseAsset[], predicate: (a: ReleaseAsset) => boolean): ReleaseAsset[] {
+  if (assets.length <= 1) return assets
+  const filtered = assets.filter(predicate)
+  return filtered.length > 0 ? filtered : assets
+}
+
 /**
  * Find the best matching asset for the current platform and architecture.
  * Filters by platform/arch keywords and optionally by a user-provided glob pattern.
@@ -128,29 +135,17 @@ function matchAsset(assets: ReleaseAsset[], filePattern: string | undefined): Re
   })
 
   // Apply filePattern filter if provided
-  if (filePattern && matched.length > 1) {
-    const filtered = matched.filter((a) => globMatch(filePattern, a.name))
-    if (filtered.length > 0) matched = filtered
-  }
+  if (filePattern) matched = narrow(matched, (a) => globMatch(filePattern, a.name))
 
   // On Linux, prefer musl (statically linked) over glibc builds — works on all Linux distros including Alpine
-  if (matched.length > 1 && platform === 'linux') {
-    const musl = matched.filter((a) => a.name.toLowerCase().includes('musl'))
-    if (musl.length > 0) matched = musl
-  }
+  if (platform === 'linux') matched = narrow(matched, (a) => a.name.toLowerCase().includes('musl'))
 
   // Prefer appropriate archive type for the platform
-  if (matched.length > 1) {
-    const preferredExt = utils.isWindows() ? '.zip' : '.tar.gz'
-    const preferred = matched.filter((a) => a.name.toLowerCase().endsWith(preferredExt))
-    if (preferred.length > 0) matched = preferred
-  }
+  const preferredExt = utils.isWindows() ? '.zip' : '.tar.gz'
+  matched = narrow(matched, (a) => a.name.toLowerCase().endsWith(preferredExt))
 
   // If still multiple, prefer archives over bare binaries
-  if (matched.length > 1) {
-    const archives = matched.filter((a) => isArchiveFile(a.name))
-    if (archives.length > 0) matched = archives
-  }
+  matched = narrow(matched, (a) => isArchiveFile(a.name))
 
   const [asset, ...rest] = matched
 
