@@ -18,26 +18,26 @@ Install the extension from the [Azure DevOps Marketplace](https://marketplace.vi
 
 - Install the latest released version:
 
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-    ```
+  ```yaml
+  steps:
+    - task: TerramateInstaller@0
+  ```
 
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-        inputs:
-          version: latest
-    ```
+  ```yaml
+  steps:
+    - task: TerramateInstaller@0
+      inputs:
+        version: latest
+  ```
 
 - Install a specific version:
 
-    ```yaml
-    steps:
-      - task: TerramateInstaller@0
-        inputs:
-          version: v0.16.0 # or 0.16.0
-    ```
+  ```yaml
+  steps:
+    - task: TerramateInstaller@0
+      inputs:
+        version: v0.16.0 # or 0.16.0
+  ```
 
 ## Migration
 
