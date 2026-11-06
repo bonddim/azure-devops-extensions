@@ -8,6 +8,9 @@
     "publish": "exec tfx extension publish --manifest-js vss-extension.js --auth-type pat --token $ENTRA_TOKEN"
   },
   "dependencies": {
-    "@bonddim/utils": "workspace:*"
+    "@bonddim/utils": "workspace:*",
+    "azure-pipelines-task-lib": "catalog:",
+    "azure-pipelines-tool-lib": "catalog:",
+    "tslib": "catalog:"
   }
 }

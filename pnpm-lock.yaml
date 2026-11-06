@@ -162,25 +162,27 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@octokit/rest':
+      specifier: ^22.0.1
+      version: 22.0.1
+    azure-pipelines-task-lib:
+      specifier: ^5.279.0
+      version: 5.282.0
+    azure-pipelines-tool-lib:
+      specifier: ^2.280.0
+      version: 2.281.0
+    semver:
+      specifier: ^7.8.5
+      version: 7.8.6
+    tslib:
+      specifier: ^2.8.1
+      version: 2.9.1
+
 importers:
 
   .:
-    dependencies:
-      '@octokit/rest':
-        specifier: ^22.0.1
-        version: 22.0.1
-      azure-pipelines-task-lib:
-        specifier: ^5.279.0
-        version: 5.282.0(debug@4.4.3)
-      azure-pipelines-tool-lib:
-        specifier: ^2.280.0
-        version: 2.281.0(debug@4.4.3)
-      semver:
-        specifier: ^7.8.5
-        version: 7.8.6
-      tslib:
-        specifier: ^2.8.1
-        version: 2.9.1
     devDependencies:
       '@biomejs/biome':
         specifier: 2.6.4
@@ -224,20 +226,63 @@ importers:
       '@bonddim/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      azure-pipelines-task-lib:
+        specifier: 'catalog:'
+        version: 5.282.0(debug@4.4.3)
+      azure-pipelines-tool-lib:
+        specifier: 'catalog:'
+        version: 2.281.0(debug@4.4.3)
+      tslib:
+        specifier: 'catalog:'
+        version: 2.9.1
 
   extensions/terramate:
     dependencies:
       '@bonddim/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      azure-pipelines-task-lib:
+        specifier: 'catalog:'
+        version: 5.282.0(debug@4.4.3)
+      azure-pipelines-tool-lib:
+        specifier: 'catalog:'
+        version: 2.281.0(debug@4.4.3)
+      tslib:
+        specifier: 'catalog:'
+        version: 2.9.1
 
   extensions/toolbox:
     dependencies:
       '@bonddim/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@octokit/rest':
+        specifier: 'catalog:'
+        version: 22.0.1
+      azure-pipelines-task-lib:
+        specifier: 'catalog:'
+        version: 5.282.0(debug@4.4.3)
+      azure-pipelines-tool-lib:
+        specifier: 'catalog:'
+        version: 2.281.0(debug@4.4.3)
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.6
+      tslib:
+        specifier: 'catalog:'
+        version: 2.9.1
 
-  packages/utils: {}
+  packages/utils:
+    dependencies:
+      azure-pipelines-task-lib:
+        specifier: 'catalog:'
+        version: 5.282.0(debug@4.4.3)
+      azure-pipelines-tool-lib:
+        specifier: 'catalog:'
+        version: 2.281.0(debug@4.4.3)
+      tslib:
+        specifier: 'catalog:'
+        version: 2.9.1
 
 packages:
 
