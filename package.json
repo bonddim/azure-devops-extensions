@@ -36,7 +36,7 @@
     "@types/semver": "7.8.0",
     "@vitest/coverage-v8": "5.1.0",
     "esbuild": "0.28.2",
-    "glob": "13.0.6",
+    "glob": "14.0.3",
     "simple-git-hooks": "2.14.0",
     "tfx-cli": "0.24.2",
     "typescript": "7.0.2",
