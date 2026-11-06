@@ -5,7 +5,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/bonddim/azure-devops-extensions/main)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-This repository contains a collection of Azure DevOps extensions that provide various tools and utilities for enhancing your Azure Pipelines experience. 
+This repository contains a collection of Azure DevOps extensions that provide various tools and utilities for enhancing your Azure Pipelines experience.  
 Each extension is designed to solve specific problems and improve the efficiency of your CI/CD workflows.
 
 ## Extensions

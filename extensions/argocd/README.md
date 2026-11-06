@@ -64,9 +64,9 @@ This option installs the version matching your Argo CD server. Requires a servic
 
 The task resolves the CLI version based on the `version` input:
 
-* `latest` - Fetches the latest release tag from the [GitHub releases](https://github.com/argoproj/argo-cd/releases) page. If resolution fails, the task fails immediately.
-* `server` - Queries the Argo CD server API (`/api/version`) to determine the running version. Requires a service connection. If the server is unreachable or returns an invalid response, the task fails immediately.
-* Explicit version (e.g. `v3.3.0`) - Used as-is without any remote lookup.
+- `latest` - Fetches the latest release tag from the [GitHub releases](https://github.com/argoproj/argo-cd/releases) page. If resolution fails, the task fails immediately.
+- `server` - Queries the Argo CD server API (`/api/version`) to determine the running version. Requires a service connection. If the server is unreachable or returns an invalid response, the task fails immediately.
+- Explicit version (e.g. `v3.3.0`) - Used as-is without any remote lookup.
 
 ## Fallback Behavior
 

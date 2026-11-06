@@ -16,48 +16,48 @@ GitHub authentication is **required**. Provide one of:
 # Latest version (auto-detect binary)
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'cli/cli'
+    connection: "my-github-connection"
+    repository: "cli/cli"
 
 # Exact version
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'mikefarah/yq'
-    version: 'v4.44.0'
+    connection: "my-github-connection"
+    repository: "mikefarah/yq"
+    version: "v4.44.0"
 
 # Semver range - installs latest 4.x release
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'mikefarah/yq'
-    version: '4.x'
+    connection: "my-github-connection"
+    repository: "mikefarah/yq"
+    version: "4.x"
 
 # Using GITHUB_TOKEN env var
 - task: GitHubToolInstaller@0
   inputs:
-    repository: 'jqlang/jq'
-    version: '~1.7.0'
+    repository: "jqlang/jq"
+    version: "~1.7.0"
   env:
     GITHUB_TOKEN: $(GITHUB_TOKEN)
 
 # With filePattern to disambiguate
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'hashicorp/terraform'
-    filePattern: 'terraform_*'
+    connection: "my-github-connection"
+    repository: "hashicorp/terraform"
+    filePattern: "terraform_*"
 
 # Multiple tools
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'mikefarah/yq'
+    connection: "my-github-connection"
+    repository: "mikefarah/yq"
 
 - task: GitHubToolInstaller@0
   inputs:
-    connection: 'my-github-connection'
-    repository: 'jqlang/jq'
+    connection: "my-github-connection"
+    repository: "jqlang/jq"
 ```
 
 ## Inputs
