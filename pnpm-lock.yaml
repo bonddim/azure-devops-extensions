@@ -169,7 +169,7 @@ catalogs:
       version: 22.0.1
     azure-pipelines-task-lib:
       specifier: ^5.279.0
-      version: 5.282.0
+      version: 5.283.3
     azure-pipelines-tool-lib:
       specifier: ^2.280.0
       version: 2.281.0
@@ -228,7 +228,7 @@ importers:
         version: link:../../packages/utils
       azure-pipelines-task-lib:
         specifier: 'catalog:'
-        version: 5.282.0(debug@4.4.3)
+        version: 5.283.3(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: 'catalog:'
         version: 2.281.0(debug@4.4.3)
@@ -243,7 +243,7 @@ importers:
         version: link:../../packages/utils
       azure-pipelines-task-lib:
         specifier: 'catalog:'
-        version: 5.282.0(debug@4.4.3)
+        version: 5.283.3(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: 'catalog:'
         version: 2.281.0(debug@4.4.3)
@@ -261,7 +261,7 @@ importers:
         version: 22.0.1
       azure-pipelines-task-lib:
         specifier: 'catalog:'
-        version: 5.282.0(debug@4.4.3)
+        version: 5.283.3(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: 'catalog:'
         version: 2.281.0(debug@4.4.3)
@@ -276,7 +276,7 @@ importers:
     dependencies:
       azure-pipelines-task-lib:
         specifier: 'catalog:'
-        version: 5.282.0(debug@4.4.3)
+        version: 5.283.3(debug@4.4.3)
       azure-pipelines-tool-lib:
         specifier: 'catalog:'
         version: 2.281.0(debug@4.4.3)
@@ -1062,8 +1062,9 @@ packages:
     resolution: {integrity: sha512-ilMGKj00R8DWR4xMUZ2XwFMhNW3eVc339loDXzoHegf4qGHMR50MC1NKtHQU2yC0SwgBQaqpJgnOw/Uz8AViig==}
     engines: {node: '>= 16.0.0'}
 
-  azure-pipelines-task-lib@5.282.0:
-    resolution: {integrity: sha512-NvTxkDwYD34ZBRq6ivp8DMRnKK5J4aYDQdHtRNgW5ZH5JbU822utm/4HJAFf5gL9pozOBnNDD4Rg5HxwGisTnA==}
+  azure-pipelines-task-lib@5.283.3:
+    resolution: {integrity: sha512-sddXfEkZkVystj6QJum+uBH0LcEUCdbeYVMPeG0LDWDyN0Sw+O6P+9F1hGP1RHfw24RMpwsIiltIwK3TZ47uAQ==}
+    engines: {node: '>=14.14.0'}
 
   azure-pipelines-tool-lib@2.281.0:
     resolution: {integrity: sha512-aTrAQKbY59Ieg1dfxHZWeSlJ8LJMAJj3k3kaVWvMv+qsIUWZxA+XBh17J+oYe2JVXlVdL9l2PHMK9KINaH2VPQ==}
@@ -3098,13 +3099,12 @@ snapshots:
       tunnel: 0.0.6
       typed-rest-client: 3.1.2
 
-  azure-pipelines-task-lib@5.282.0(debug@4.4.3):
+  azure-pipelines-task-lib@5.283.3(debug@4.4.3):
     dependencies:
       minimatch: 3.1.5
       nodejs-file-downloader: 4.13.0(debug@4.4.3)
       q: 1.5.1
       semver: 5.7.3
-      shelljs: 0.10.0
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -3112,7 +3112,7 @@ snapshots:
   azure-pipelines-tool-lib@2.281.0(debug@4.4.3):
     dependencies:
       '@types/semver': 5.5.0
-      azure-pipelines-task-lib: 5.282.0(debug@4.4.3)
+      azure-pipelines-task-lib: 5.283.3(debug@4.4.3)
       semver: 5.7.3
       semver-compare: 1.0.0
       typed-rest-client: 3.1.2
